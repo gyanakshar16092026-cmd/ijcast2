@@ -45,6 +45,7 @@ export const TopHeader = () => {
           <button
             onClick={() => setIsSearchOpen(true)}
             className="flex items-center space-x-2 px-3 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 rounded-lg transition-colors"
+            title="Search articles (Ctrl+K)"
           >
             <Search className="w-3.5 h-3.5 text-amber-500" />
             <span>Search Articles...</span>

@@ -81,6 +81,55 @@ export const JournalProvider = ({ children }) => {
       try { localStorage.removeItem(key); } catch {}
     });
 
+    // PHASE 2: Proper Supabase Auth session management
+    if (isSupabaseConfigured && supabase) {
+      // Restore session on app load
+      const restoreAuthSession = async () => {
+        try {
+          const { data: { session }, error } = await supabase.auth.getSession();
+          if (session && session.user && !error) {
+            // Valid session found, restore admin session
+            setAdminSession({ 
+              user: session.user, 
+              token: session.access_token, 
+              mode: 'supabase' 
+            });
+          } else {
+            // No valid session, clear any stale localStorage session
+            setAdminSession(null);
+          }
+        } catch (err) {
+          console.warn('Failed to restore auth session:', err);
+          setAdminSession(null);
+        }
+      };
+
+      // Setup auth state change listener
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+          setAdminSession({ 
+            user: session.user, 
+            token: session.access_token, 
+            mode: 'supabase' 
+          });
+        } else if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED' && !session) {
+          setAdminSession(null);
+        } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+          setAdminSession({ 
+            user: session.user, 
+            token: session.access_token, 
+            mode: 'supabase' 
+          });
+        }
+      });
+
+      // Restore session immediately
+      restoreAuthSession();
+
+      // Cleanup listener on unmount
+      return () => subscription?.unsubscribe?.();
+    }
+
   // Fetch editorial members immediately and independently for fast load
   if (isSupabaseConfigured && supabase) {
     supabase.from('editorial_members').select('*').order('sort_order', { ascending: true })
@@ -203,41 +252,62 @@ export const JournalProvider = ({ children }) => {
     };
 
     fetchSupabaseData();
-  }, []);
+  }, [isSupabaseConfigured]);
 
   // --- CRUD ACTIONS ---
+
+  // PHASE 3: Authorization Helper
+  const requireAdminAuth = () => {
+    if (!adminSession || !adminSession.user) {
+      throw new Error('Admin authentication required');
+    }
+    if (adminSession.mode !== 'supabase') {
+      throw new Error('Proper Supabase authentication required');
+    }
+    return true;
+  };
 
   // Admin Login / Logout
   const loginAdmin = async (email, password) => {
     if (isSupabaseConfigured && supabase) {
       try {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (!error && data?.user) {
-          setAdminSession({ user: data.user, token: data.session.access_token, mode: 'supabase' });
+        if (!error && data?.user && data?.session) {
+          // Session will be automatically set by onAuthStateChange listener
           return data;
         }
+        if (error) {
+          throw new Error(error.message || 'Invalid Administrator Credentials');
+        }
       } catch (err) {
-        console.warn('Supabase auth sign-in notice:', err);
+        throw new Error(err.message || 'Invalid Administrator Credentials');
       }
     }
-    // Fallback Admin Credentials
-    if (email === 'gyanaksharsanskritifoundation@gmail.com' && password === 'gyanaksharsanskritifoundation@.com') {
-      const demoUser = { id: 'demo-admin-id', email: 'gyanaksharsanskritifoundation@gmail.com', role: 'Administrator' };
-      setAdminSession({ user: demoUser, token: 'demo-token', mode: isSupabaseConfigured ? 'supabase' : 'demo' });
-      return { user: demoUser };
-    }
-    throw new Error('Invalid Administrator Credentials');
+    
+    // SECURITY: Hardcoded credentials removed for production security
+    // Admin authentication must be properly configured through Supabase Auth
+    throw new Error('Admin authentication requires Supabase configuration');
   };
 
   const logoutAdmin = async () => {
     if (isSupabaseConfigured && supabase) {
-      await supabase.auth.signOut();
+      try {
+        await supabase.auth.signOut();
+        // Session will be automatically cleared by onAuthStateChange listener
+      } catch (err) {
+        console.warn('Logout error:', err);
+        // Force clear session even if signOut fails
+        setAdminSession(null);
+      }
+    } else {
+      setAdminSession(null);
     }
-    setAdminSession(null);
   };
 
   // Settings
   const updateSettings = async (newSettings) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     const updated = { ...settings, ...newSettings, updated_at: new Date().toISOString() };
     setSettings(updated);
     if (isSupabaseConfigured && supabase) {
@@ -262,6 +332,8 @@ export const JournalProvider = ({ children }) => {
 
   // Volumes
   const saveVolume = async (volumeData, options = {}) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     const { autoGenerateIssues = true } = options;
     
     if (isSupabaseConfigured && supabase) {
@@ -342,6 +414,8 @@ export const JournalProvider = ({ children }) => {
   };
 
   const deleteVolume = async (id) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     setVolumes(volumes.filter(v => v.id !== id));
     if (isSupabaseConfigured && supabase) {
       await supabase.from('volumes').delete().eq('id', id);
@@ -350,6 +424,8 @@ export const JournalProvider = ({ children }) => {
 
   // Issues
   const saveIssue = async (issueData) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     if (isSupabaseConfigured && supabase) {
       const isNew = !issueData.id || issueData.id.startsWith('iss-');
       if (isNew) {
@@ -371,6 +447,8 @@ export const JournalProvider = ({ children }) => {
   };
 
   const deleteIssue = async (id) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     setIssues(issues.filter(i => i.id !== id));
     if (isSupabaseConfigured && supabase) {
       await supabase.from('issues').delete().eq('id', id);
@@ -378,6 +456,8 @@ export const JournalProvider = ({ children }) => {
   };
 
   const reorderIssues = (reorderedList) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     const updated = reorderedList.map((item, index) => ({ ...item, sort_order: index + 1 }));
     setIssues(updated);
     if (isSupabaseConfigured && supabase) {
@@ -387,6 +467,8 @@ export const JournalProvider = ({ children }) => {
 
   // Articles
   const saveArticle = async (articleData) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     if (isSupabaseConfigured && supabase) {
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       const isNew = !articleData.id || articleData.id.startsWith('art-');
@@ -431,6 +513,8 @@ export const JournalProvider = ({ children }) => {
   };
 
   const deleteArticle = async (id) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     setArticles(articles.filter(a => a.id !== id));
     if (isSupabaseConfigured && supabase) {
       await supabase.from('articles').delete().eq('id', id);
@@ -438,6 +522,8 @@ export const JournalProvider = ({ children }) => {
   };
 
   const toggleArticlePublish = async (id) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     const updated = articles.map(a => a.id === id ? { ...a, is_published: !a.is_published } : a);
     setArticles(updated);
     const target = updated.find(a => a.id === id);
@@ -447,6 +533,8 @@ export const JournalProvider = ({ children }) => {
   };
 
   const moveArticle = async (articleId, newIssueId) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     const updated = articles.map(a => a.id === articleId ? { ...a, issue_id: newIssueId } : a);
     setArticles(updated);
     if (isSupabaseConfigured && supabase) {
@@ -455,6 +543,8 @@ export const JournalProvider = ({ children }) => {
   };
 
   const reorderArticles = (reorderedList) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     const updated = articles.map(a => {
       const found = reorderedList.find(r => r.id === a.id);
       return found ? { ...a, sort_order: found.sort_order } : a;
@@ -467,6 +557,8 @@ export const JournalProvider = ({ children }) => {
 
   // Editorial Members
   const saveEditorialMember = async (memberData) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     if (isSupabaseConfigured && supabase) {
       const isNew = !memberData.id || memberData.id.startsWith('ed-');
 
@@ -520,6 +612,8 @@ export const JournalProvider = ({ children }) => {
   };
 
   const deleteEditorialMember = async (id) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     setEditorialMembers(editorialMembers.filter(m => m.id !== id));
     if (isSupabaseConfigured && supabase) {
       await supabase.from('editorial_members').delete().eq('id', id);
@@ -527,6 +621,8 @@ export const JournalProvider = ({ children }) => {
   };
 
   const toggleEditorialActive = async (id) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     const updated = editorialMembers.map(m => m.id === id ? { ...m, is_active: !m.is_active } : m);
     setEditorialMembers(updated);
     const target = updated.find(m => m.id === id);
@@ -536,6 +632,8 @@ export const JournalProvider = ({ children }) => {
   };
 
   const reorderEditorialMembers = (reorderedList) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     const updated = reorderedList.map((item, index) => ({ ...item, sort_order: index + 1 }));
     setEditorialMembers(updated);
     if (isSupabaseConfigured && supabase) {
@@ -545,6 +643,8 @@ export const JournalProvider = ({ children }) => {
 
   // Research Areas
   const saveResearchArea = async (raData) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     const normalized = {
       ...raData,
       subcategories: Array.isArray(raData.subcategories)
@@ -574,6 +674,8 @@ export const JournalProvider = ({ children }) => {
   };
 
   const deleteResearchArea = async (id) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     setResearchAreas(researchAreas.filter(r => r.id !== id));
     if (isSupabaseConfigured && supabase) {
       await supabase.from('research_areas').delete().eq('id', id);
@@ -582,6 +684,8 @@ export const JournalProvider = ({ children }) => {
 
   // CMS Page Content
   const savePageContent = async (pageKey, sectionKey, title, content) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     const existing = pageContents.find(p => p.page_key === pageKey && p.section_key === sectionKey);
     let updated;
     if (existing) {
@@ -598,6 +702,8 @@ export const JournalProvider = ({ children }) => {
 
   // Media Management
   const addMediaItem = async (mediaData) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     const newMed = { ...mediaData, id: `med-${Date.now()}`, uploaded_at: new Date().toISOString() };
     setMediaItems([newMed, ...mediaItems]);
     if (isSupabaseConfigured && supabase) {
@@ -607,6 +713,8 @@ export const JournalProvider = ({ children }) => {
   };
 
   const deleteMediaItem = async (id) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     setMediaItems(mediaItems.filter(m => m.id !== id));
     if (isSupabaseConfigured && supabase) {
       await supabase.from('media').delete().eq('id', id);
@@ -615,6 +723,8 @@ export const JournalProvider = ({ children }) => {
 
   // Theses
   const saveThesis = async (thesisData) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     const normalized = {
       ...thesisData,
       guide_names: Array.isArray(thesisData.guide_names)
@@ -647,6 +757,60 @@ export const JournalProvider = ({ children }) => {
     }
   };
 
+  // PHASE 16: FILE UPLOAD SECURITY - Validate file before upload
+  const validateFileUpload = (file, allowedTypes, maxSizeMB = 10) => {
+    if (!file) {
+      throw new Error('No file provided');
+    }
+
+    // 1. File size validation
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+    if (file.size > maxSizeBytes) {
+      throw new Error(`File size exceeds ${maxSizeMB}MB limit`);
+    }
+
+    if (file.size === 0) {
+      throw new Error('File is empty');
+    }
+
+    // 2. File type validation (MIME type)
+    const allowedMimeTypes = {
+      'pdf': ['application/pdf'],
+      'doc': ['application/msword'],
+      'docx': ['application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+    };
+
+    let isValidMimeType = false;
+    for (const type of allowedTypes) {
+      if (allowedMimeTypes[type] && allowedMimeTypes[type].includes(file.type)) {
+        isValidMimeType = true;
+        break;
+      }
+    }
+
+    if (!isValidMimeType) {
+      throw new Error(`Invalid file type. Allowed types: ${allowedTypes.join(', ')}`);
+    }
+
+    // 3. File extension validation (double-check)
+    const fileName = file.name.toLowerCase();
+    const hasValidExtension = allowedTypes.some(type => fileName.endsWith(`.${type}`));
+    
+    if (!hasValidExtension) {
+      throw new Error(`Invalid file extension. File must have one of: ${allowedTypes.map(t => `.${t}`).join(', ')}`);
+    }
+
+    // 4. Sanitize filename (remove dangerous characters)
+    const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    
+    return {
+      isValid: true,
+      sanitizedName,
+      size: file.size,
+      type: file.type
+    };
+  };
+
   // Paper Submissions
   const submitPaper = async (submissionData, files) => {
     if (!isSupabaseConfigured || !supabase) {
@@ -654,6 +818,17 @@ export const JournalProvider = ({ children }) => {
     }
 
     try {
+      // PHASE 16: SECURITY - Validate files before upload
+      if (files.manuscript_file) {
+        validateFileUpload(files.manuscript_file, ['pdf', 'doc', 'docx'], 10);
+      }
+      if (files.cover_letter_file) {
+        validateFileUpload(files.cover_letter_file, ['pdf', 'doc', 'docx'], 5);
+      }
+      if (files.copyright_file) {
+        validateFileUpload(files.copyright_file, ['pdf'], 2);
+      }
+
       // 1. Generate submission ID using database function
       const { data: idData, error: idError } = await supabase.rpc('generate_submission_id');
       if (idError) throw new Error('Failed to generate submission ID');
@@ -665,8 +840,11 @@ export const JournalProvider = ({ children }) => {
       let copyrightUrl = null, copyrightFilename = null;
 
       if (files.manuscript_file) {
-        const ext = files.manuscript_file.name.split('.').pop();
+        // PHASE 16: SECURITY - Sanitize filename
+        const validation = validateFileUpload(files.manuscript_file, ['pdf', 'doc', 'docx'], 10);
+        const ext = files.manuscript_file.name.split('.').pop().toLowerCase();
         const fileName = `${submissionId}-manuscript.${ext}`;
+        
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('manuscripts')
           .upload(fileName, files.manuscript_file, { 
@@ -674,14 +852,17 @@ export const JournalProvider = ({ children }) => {
             upsert: true 
           });
         if (uploadError) throw new Error('Failed to upload manuscript file');
-        const { data: { publicUrl } } = supabase.storage.from('manuscripts').getPublicUrl(fileName);
-        manuscriptUrl = publicUrl;
-        manuscriptFilename = files.manuscript_file.name;
+        // PHASE 13: CRITICAL SECURITY FIX - Store private path instead of public URL
+        manuscriptUrl = fileName; // Store bucket path, not public URL
+        manuscriptFilename = validation.sanitizedName;
       }
 
       if (files.cover_letter_file) {
-        const ext = files.cover_letter_file.name.split('.').pop();
+        // PHASE 16: SECURITY - Sanitize filename
+        const validation = validateFileUpload(files.cover_letter_file, ['pdf', 'doc', 'docx'], 5);
+        const ext = files.cover_letter_file.name.split('.').pop().toLowerCase();
         const fileName = `${submissionId}-cover-letter.${ext}`;
+        
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('manuscripts')
           .upload(fileName, files.cover_letter_file, { 
@@ -689,15 +870,18 @@ export const JournalProvider = ({ children }) => {
             upsert: true 
           });
         if (!uploadError) {
-          const { data: { publicUrl } } = supabase.storage.from('manuscripts').getPublicUrl(fileName);
-          coverLetterUrl = publicUrl;
-          coverLetterFilename = files.cover_letter_file.name;
+          // PHASE 13: CRITICAL SECURITY FIX - Store private path instead of public URL
+          coverLetterUrl = fileName; // Store bucket path, not public URL
+          coverLetterFilename = validation.sanitizedName;
         }
       }
 
       if (files.copyright_file) {
-        const ext = files.copyright_file.name.split('.').pop();
+        // PHASE 16: SECURITY - Sanitize filename
+        const validation = validateFileUpload(files.copyright_file, ['pdf'], 2);
+        const ext = files.copyright_file.name.split('.').pop().toLowerCase();
         const fileName = `${submissionId}-copyright.${ext}`;
+        
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('manuscripts')
           .upload(fileName, files.copyright_file, { 
@@ -705,9 +889,9 @@ export const JournalProvider = ({ children }) => {
             upsert: true 
           });
         if (!uploadError) {
-          const { data: { publicUrl } } = supabase.storage.from('manuscripts').getPublicUrl(fileName);
-          copyrightUrl = publicUrl;
-          copyrightFilename = files.copyright_file.name;
+          // PHASE 13: CRITICAL SECURITY FIX - Store private path instead of public URL
+          copyrightUrl = fileName; // Store bucket path, not public URL
+          copyrightFilename = validation.sanitizedName;
         }
       }
 
@@ -799,6 +983,8 @@ export const JournalProvider = ({ children }) => {
   };
 
   const updateSubmissionStatus = async (submissionId, newStatus) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     if (!isSupabaseConfigured || !supabase) return;
 
     try {
@@ -823,8 +1009,32 @@ export const JournalProvider = ({ children }) => {
     }
   };
 
+  // PHASE 13: SECURE MANUSCRIPT FILE ACCESS
+  const getSecureManuscriptUrl = async (filePath, expiresIn = 3600) => {
+    requireAdminAuth(); // Only admin can access manuscript files
+    
+    if (!isSupabaseConfigured || !supabase || !filePath) {
+      throw new Error('Invalid request for manuscript file access');
+    }
+
+    try {
+      // Generate signed URL for temporary admin access (1 hour default)
+      const { data, error } = await supabase.storage
+        .from('manuscripts')
+        .createSignedUrl(filePath, expiresIn);
+
+      if (error) throw error;
+      return data.signedUrl;
+    } catch (error) {
+      console.error('Secure manuscript URL generation error:', error);
+      throw error;
+    }
+  };
+
   // Sync all local articles to Supabase (one-time migration)
   const syncArticlesToSupabase = async () => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     if (!isSupabaseConfigured || !supabase) return { success: false, message: 'Supabase not configured' };
     try {
       // Delete all existing rows first to avoid duplicates
@@ -854,13 +1064,18 @@ export const JournalProvider = ({ children }) => {
     }
   };
 
-  const deleteThesis = async (id) => {    setTheses(theses.filter(t => t.id !== id));
+  const deleteThesis = async (id) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
+    setTheses(theses.filter(t => t.id !== id));
     if (isSupabaseConfigured && supabase) {
       await supabase.from('theses').delete().eq('id', id);
     }
   };
 
   const toggleThesisPublish = async (id) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     const updated = theses.map(t => t.id === id ? { ...t, is_published: !t.is_published } : t);
     setTheses(updated);
     const target = updated.find(t => t.id === id);
@@ -871,6 +1086,8 @@ export const JournalProvider = ({ children }) => {
 
   // Conferences CRUD
   const saveConference = async (data) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     const normalized = {
       ...data,
       research_areas: Array.isArray(data.research_areas) ? data.research_areas : (data.research_areas || '').split(',').map(s => s.trim()).filter(Boolean),
@@ -899,12 +1116,16 @@ export const JournalProvider = ({ children }) => {
   };
 
   const deleteConference = async (id) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     setConferences(prev => prev.filter(c => c.id !== id));
     if (isSupabaseConfigured && supabase) await supabase.from('conferences').delete().eq('id', id);
   };
 
   // Announcements CRUD
   const saveAnnouncement = async (data) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     const isNew = !data.id || data.id.startsWith('ann-');
     if (isSupabaseConfigured && supabase) {
       if (isNew) {
@@ -924,11 +1145,15 @@ export const JournalProvider = ({ children }) => {
   };
 
   const deleteAnnouncement = async (id) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     setAnnouncements(prev => prev.filter(a => a.id !== id));
     if (isSupabaseConfigured && supabase) await supabase.from('announcements').delete().eq('id', id);
   };
 
   const toggleAnnouncement = async (id) => {
+    requireAdminAuth(); // PHASE 3: Authorization check
+    
     const updated = announcements.map(a => a.id === id ? { ...a, is_active: !a.is_active } : a);
     setAnnouncements(updated);
     const target = updated.find(a => a.id === id);
@@ -989,7 +1214,8 @@ export const JournalProvider = ({ children }) => {
     // Paper Submissions
     submitPaper,
     fetchSubmissions,
-    updateSubmissionStatus
+    updateSubmissionStatus,
+    getSecureManuscriptUrl
   };
 
   return (

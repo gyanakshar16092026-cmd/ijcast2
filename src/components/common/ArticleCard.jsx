@@ -14,11 +14,13 @@ export const ArticleCard = ({ article }) => {
 
   // Citation generator formatting
   const mainAuthor = article.authors?.[0]?.name || 'IJCAST Author';
-  const yearStr = issueObj ? issueObj.year : '2026';
+  // PHASE 11: Use current year as fallback instead of hardcoded 2026  
+  const yearStr = issueObj ? issueObj.year : new Date().getFullYear();
   const volStr = volObj ? `Vol. ${volObj.volume_number}` : '';
   const issStr = issueObj ? `No. ${issueObj.issue_number}` : '';
 
-  const apaCitation = `${mainAuthor} et al. (${yearStr}). ${article.title}. ${settings.journal_name}, ${volStr}(${issStr}), ${article.page_numbers || '1-10'}. ${article.doi ? `https://doi.org/${article.doi}` : ''}`;
+  // PHASE 10: Fixed citation formatting - only include DOI when actually present
+  const apaCitation = `${mainAuthor} et al. (${yearStr}). ${article.title}. ${settings.journal_name}, ${volStr}(${issStr}), ${article.page_numbers || '1-10'}.${article.doi ? ` https://doi.org/${article.doi}` : ''}`;
 
   const handleCopyCitation = () => {
     navigator.clipboard.writeText(apaCitation);

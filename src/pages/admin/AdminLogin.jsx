@@ -32,11 +32,6 @@ export const AdminLogin = () => {
     }
   };
 
-  const fillDemoCredentials = () => {
-    setEmail('gyanaksharsanskritifoundation@gmail.com');
-    setPassword('gyanaksharsanskritifoundation@.com');
-  };
-
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative">
       <div className="absolute top-6 left-6">
@@ -105,14 +100,8 @@ export const AdminLogin = () => {
           </button>
         </form>
 
-        {/* Quick Login */}
+        {/* Login Help */}
         <div className="pt-4 border-t border-slate-800 text-center space-y-2">
-          <button
-            onClick={fillDemoCredentials}
-            className="text-xs text-amber-400 hover:underline"
-          >
-            Auto-fill Admin Credentials
-          </button>
           <div>
             <p className="text-[11px] text-slate-500">
               Forgot password?{' '}

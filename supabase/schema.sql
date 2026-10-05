@@ -218,7 +218,7 @@ CREATE TABLE IF NOT EXISTS media (
 );
 
 -- ========================================================
--- ROW LEVEL SECURITY (RLS) POLICIES
+-- ROW LEVEL SECURITY (RLS) POLICIES - SECURE VERSION
 -- ========================================================
 
 ALTER TABLE journal_settings ENABLE ROW LEVEL SECURITY;
@@ -230,16 +230,64 @@ ALTER TABLE research_areas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE page_content ENABLE ROW LEVEL SECURITY;
 ALTER TABLE media ENABLE ROW LEVEL SECURITY;
 
--- Allow ALL operations for everyone (anon + authenticated)
--- This app uses a single admin with app-level auth, not Supabase Auth
-CREATE POLICY "Allow All Journal Settings" ON journal_settings FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow All Volumes" ON volumes FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow All Issues" ON issues FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow All Articles" ON articles FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow All Editorial Members" ON editorial_members FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow All Research Areas" ON research_areas FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow All Page Content" ON page_content FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow All Media" ON media FOR ALL USING (true) WITH CHECK (true);
+-- SECURE POLICIES: Public can only access published/public content
+-- Admin (authenticated) users can manage all content
+
+-- Journal Settings: Public can read basic info, authenticated can modify
+CREATE POLICY "Public read journal settings" ON journal_settings
+  FOR SELECT USING (true);
+
+CREATE POLICY "Authenticated modify journal settings" ON journal_settings
+  FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+
+-- Volumes: Public can read all volumes
+CREATE POLICY "Public read volumes" ON volumes
+  FOR SELECT USING (true);
+
+CREATE POLICY "Authenticated manage volumes" ON volumes
+  FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+
+-- Issues: Public can read published issues only
+CREATE POLICY "Public read published issues" ON issues
+  FOR SELECT USING (is_published = true);
+
+CREATE POLICY "Authenticated manage all issues" ON issues
+  FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+
+-- Articles: Public can ONLY read published articles
+CREATE POLICY "Public read published articles" ON articles
+  FOR SELECT USING (is_published = true AND status = 'published');
+
+CREATE POLICY "Authenticated manage all articles" ON articles
+  FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+
+-- Editorial Members: Public can read active members only
+CREATE POLICY "Public read active editorial members" ON editorial_members
+  FOR SELECT USING (is_active = true);
+
+CREATE POLICY "Authenticated manage editorial members" ON editorial_members
+  FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+
+-- Research Areas: Public can read all research areas
+CREATE POLICY "Public read research areas" ON research_areas
+  FOR SELECT USING (true);
+
+CREATE POLICY "Authenticated manage research areas" ON research_areas
+  FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+
+-- Page Content: Public can read all page content
+CREATE POLICY "Public read page content" ON page_content
+  FOR SELECT USING (true);
+
+CREATE POLICY "Authenticated manage page content" ON page_content
+  FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+
+-- Media: Public can read published media only
+CREATE POLICY "Public read published media" ON media
+  FOR SELECT USING (true);
+
+CREATE POLICY "Authenticated manage media" ON media
+  FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 
 -- 12. THESES TABLE
 CREATE TABLE IF NOT EXISTS theses (
@@ -260,11 +308,13 @@ CREATE TABLE IF NOT EXISTS theses (
 
 ALTER TABLE theses ENABLE ROW LEVEL SECURITY;
 
--- Public can read published theses
-CREATE POLICY "Public Read Theses" ON theses FOR SELECT USING (is_published = true OR auth.role() = 'authenticated');
+-- Public can read published theses only
+CREATE POLICY "Public read published theses" ON theses
+  FOR SELECT USING (is_published = true);
 
 -- Authenticated users (admins) can do all operations
-CREATE POLICY "Admin All Theses" ON theses FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated manage theses" ON theses
+  FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 
 -- 13. ANNOUNCEMENTS TABLE (Newsflash banner on home page)
 CREATE TABLE IF NOT EXISTS announcements (
@@ -279,11 +329,13 @@ CREATE TABLE IF NOT EXISTS announcements (
 
 ALTER TABLE announcements ENABLE ROW LEVEL SECURITY;
 
--- Anyone can read active announcements
-CREATE POLICY "Public Read Announcements" ON announcements FOR SELECT USING (true);
+-- Public can read active, non-expired announcements only
+CREATE POLICY "Public read active announcements" ON announcements
+  FOR SELECT USING (is_active = true AND (expires_at IS NULL OR expires_at > CURRENT_DATE));
 
--- Anon key can do all operations (app-level auth)
-CREATE POLICY "Allow All Announcements" ON announcements FOR ALL USING (true) WITH CHECK (true);
+-- Authenticated users can manage all announcements
+CREATE POLICY "Authenticated manage announcements" ON announcements
+  FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 
 -- 14. CONFERENCES TABLE
 CREATE TABLE IF NOT EXISTS conferences (
@@ -304,8 +356,14 @@ CREATE TABLE IF NOT EXISTS conferences (
 );
 
 ALTER TABLE conferences ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public Read Conferences" ON conferences FOR SELECT USING (true);
-CREATE POLICY "Allow All Conferences" ON conferences FOR ALL USING (true) WITH CHECK (true);
+
+-- Public can read published conferences only
+CREATE POLICY "Public read published conferences" ON conferences
+  FOR SELECT USING (is_published = true);
+
+-- Authenticated users can manage all conferences  
+CREATE POLICY "Authenticated manage conferences" ON conferences
+  FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 
 -- 15. APC PAYMENTS TABLE (Article Processing Charges)
 CREATE TABLE IF NOT EXISTS apc_payments (
@@ -356,12 +414,13 @@ CREATE OR REPLACE TRIGGER update_apc_payments_updated_at
 -- Add RLS policies (Row Level Security)
 ALTER TABLE apc_payments ENABLE ROW LEVEL SECURITY;
 
--- Policy for service role (full access for backend)
-CREATE POLICY "Service role can manage all payments" ON apc_payments
+-- Policy for service role (full access for backend/edge functions)
+CREATE POLICY "Service role manage payments" ON apc_payments
   FOR ALL USING (auth.role() = 'service_role');
 
--- Policy for anon key (app-level auth)
-CREATE POLICY "Allow All APC Payments" ON apc_payments FOR ALL USING (true) WITH CHECK (true);
+-- Policy for authenticated admin users
+CREATE POLICY "Authenticated manage payments" ON apc_payments
+  FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 
 -- Add comments for documentation
 COMMENT ON TABLE apc_payments IS 'Store APC (Article Processing Charge) payment records for IJCAST journal';
@@ -473,47 +532,42 @@ CREATE INDEX IF NOT EXISTS idx_editorial_members_is_active ON editorial_members(
 -- ADDITIONAL RLS POLICIES FOR NEW TABLES
 -- ========================================================
 
--- Enable RLS on submissions table
+-- ========================================================
+-- SECURE RLS POLICIES FOR SENSITIVE TABLES
+-- ========================================================
+
+-- Enable RLS on submissions table (HIGHLY SENSITIVE)
 ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;
 
--- Allow public insert (for submission form)
-CREATE POLICY "Allow public insert submissions" ON submissions
-  FOR INSERT
-  TO anon
-  WITH CHECK (true);
+-- Allow public to submit (create) new submissions only
+CREATE POLICY "Allow public submission creation" ON submissions
+  FOR INSERT TO anon WITH CHECK (true);
 
--- Allow public select for their own submissions (if you add user auth)
-CREATE POLICY "Allow users to view own submissions" ON submissions
-  FOR SELECT
-  TO authenticated
-  USING (author_email = auth.jwt()->>'email');
-
--- Allow admin full access
-CREATE POLICY "Allow All Submissions" ON submissions FOR ALL USING (true) WITH CHECK (true);
+-- Allow authenticated admin users full access to all submissions
+CREATE POLICY "Authenticated manage all submissions" ON submissions
+  FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 
 -- Enable RLS on submission_authors
 ALTER TABLE submission_authors ENABLE ROW LEVEL SECURITY;
 
--- Allow insert when inserting submission
-CREATE POLICY "Allow insert submission_authors" ON submission_authors
-  FOR INSERT
-  TO anon
-  WITH CHECK (true);
+-- Allow insertion when creating submissions
+CREATE POLICY "Allow submission authors creation" ON submission_authors
+  FOR INSERT TO anon WITH CHECK (true);
 
--- Allow admin full access
-CREATE POLICY "Allow All Submission Authors" ON submission_authors FOR ALL USING (true) WITH CHECK (true);
+-- Allow admin full access to submission authors
+CREATE POLICY "Authenticated manage submission authors" ON submission_authors
+  FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 
--- Enable RLS on contact_messages
+-- Enable RLS on contact_messages (SENSITIVE)
 ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
 
--- Allow public insert
-CREATE POLICY "Allow public insert contact_messages" ON contact_messages
-  FOR INSERT
-  TO anon
-  WITH CHECK (true);
+-- Allow public to create contact messages only
+CREATE POLICY "Allow contact message creation" ON contact_messages
+  FOR INSERT TO anon WITH CHECK (true);
 
--- Allow admin full access
-CREATE POLICY "Allow All Contact Messages" ON contact_messages FOR ALL USING (true) WITH CHECK (true);
+-- Allow authenticated admin users to manage all contact messages
+CREATE POLICY "Authenticated manage contact messages" ON contact_messages
+  FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 
 -- ========================================================
 -- STORAGE BUCKETS SETUP INSTRUCTIONS

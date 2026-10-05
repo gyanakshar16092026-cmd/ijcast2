@@ -151,14 +151,35 @@ export class PaymentService {
     };
   }
 
-  // Validate GASF membership number (placeholder - implement actual validation)
+  // Validate GASF membership number
   async validateGASFMembership(membershipNumber) {
-    // TODO: Implement actual GASF membership validation
-    // For now, return true for demo purposes
+    // PHASE 15: SECURITY - Input validation
+    if (!membershipNumber || typeof membershipNumber !== 'string') {
+      return { isValid: false, message: 'Invalid membership number format' };
+    }
+
+    // Sanitize input
+    const sanitized = membershipNumber.trim().toUpperCase();
+    
+    // Basic format validation (example: GASF-YYYY-NNNN)
+    const validFormat = /^GASF-\d{4}-\d{4}$/.test(sanitized);
+    
+    if (!validFormat) {
+      return { 
+        isValid: false, 
+        message: 'Invalid membership number format. Expected format: GASF-YYYY-NNNN' 
+      };
+    }
+
+    // TODO: Implement actual GASF membership validation against database
+    // For now, return mock validation for demo purposes
+    console.log('GASF membership validation (mock):', sanitized);
+    
     return {
       isValid: true,
-      memberType: 'Professional', // or 'Student'
-      memberName: 'Demo Member'
+      memberType: 'Professional',
+      memberName: 'Demo Member',
+      membershipNumber: sanitized
     };
   }
 }

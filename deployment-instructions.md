@@ -10,8 +10,8 @@
 Set your Cashfree production credentials as Supabase secrets:
 
 ```bash
-# Set Cashfree App ID (use your exact App ID - do not modify)
-supabase secrets set CASHFREE_APP_ID=1441120d9e27c52380edb7f14b70211441
+# Set Cashfree App ID (use your actual production App ID from Cashfree dashboard)
+supabase secrets set CASHFREE_APP_ID=your_actual_production_app_id
 
 # Set Cashfree Secret Key (replace with your actual production secret key)
 supabase secrets set CASHFREE_SECRET_KEY=your_actual_production_secret_key

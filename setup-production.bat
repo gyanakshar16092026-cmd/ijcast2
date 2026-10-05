@@ -12,9 +12,9 @@ echo ✅ verify-payment
 echo.
 
 echo All secrets have been configured:
-echo ✅ CASHFREE_APP_ID = 1441120d9e27c52380edb7f14b70211441
-echo ✅ CASHFREE_SECRET_KEY = cfsk_ma_prod_*** (production key set)
-echo ✅ FRONTEND_URL = http://localhost:5173
+echo ✅ CASHFREE_APP_ID = [CONFIGURED]
+echo ✅ CASHFREE_SECRET_KEY = [CONFIGURED]
+echo ✅ FRONTEND_URL = [CONFIGURED]
 echo.
 
 echo ============================================================

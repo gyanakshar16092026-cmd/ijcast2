@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { useJournal } from '../../context/JournalContext';
-import { BookOpen, Menu, X, Send, ChevronDown } from 'lucide-react';
+import { BookOpen, Menu, X, Send, ChevronDown, Search } from 'lucide-react';
 
 export const Navbar = () => {
-  const { settings, setIsSubmitOpen } = useJournal();
+  const { settings, setIsSubmitOpen, setIsSearchOpen } = useJournal();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [aboutDropdownOpen, setAboutDropdownOpen] = useState(false);
   const [authorsDropdownOpen, setAuthorsDropdownOpen] = useState(false);
@@ -61,6 +61,16 @@ export const Navbar = () => {
 
         {/* CTA & Mobile Toggle */}
         <div className="flex items-center space-x-3">
+          {/* PHASE 8: Added search trigger for better discoverability */}
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="hidden lg:inline-flex items-center space-x-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm rounded-lg transition-colors"
+            title="Search published articles"
+          >
+            <Search className="w-4 h-4" />
+            <span>Search</span>
+          </button>
+          
           <button
             onClick={() => setIsSubmitOpen(true)}
             className="hidden sm:inline-flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 hover:shadow-xl"
@@ -92,7 +102,19 @@ export const Navbar = () => {
               </NavLink>
             </div>
           ))}
-          <div className="pt-3 border-t border-slate-200">
+          <div className="pt-3 border-t border-slate-200 space-y-2">
+            {/* PHASE 8: Added mobile search trigger */}
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setIsSearchOpen(true);
+              }}
+              className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-sm"
+            >
+              <Search className="w-4 h-4" />
+              <span>Search Articles</span>
+            </button>
+            
             <button
               onClick={() => {
                 setMobileMenuOpen(false);

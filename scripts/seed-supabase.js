@@ -10,8 +10,19 @@ import {
   initialMedia
 } from '../src/lib/mockData.js';
 
-const supabaseUrl = 'https://ccethswedisoehyxujqt.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjZXRoc3dlZGlzb2VoeXh1anF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxOTg1NTYsImV4cCI6MjEwNDc3NDU1Nn0.-Yb_4WPavixwz-3YgtH_-RD4jREQH-okCjGzv-ux830';
+import dotenv from 'dotenv';
+dotenv.config();
+
+// SECURITY: Use environment variables instead of hardcoded credentials
+// NOTE: The previous hardcoded credentials have been COMPROMISED and should be rotated
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('❌ SECURITY ERROR: Supabase credentials not found in environment variables');
+  console.error('Required: VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env file');
+  process.exit(1);
+}
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 

@@ -5,7 +5,7 @@ import { supabase, isSupabaseConfigured } from '../config/supabase.js';
 
 const router = express.Router();
 
-// Cashfree webhook endpoint
+// PHASE 15: SECURITY - Enhanced webhook validation
 router.post('/cashfree', express.raw({ type: 'application/json' }), async (req, res) => {
   try {
     const signature = req.headers['x-webhook-signature'];
@@ -14,6 +14,17 @@ router.post('/cashfree', express.raw({ type: 'application/json' }), async (req, 
     if (!signature || !timestamp) {
       console.error('Missing webhook signature or timestamp');
       return res.status(400).json({ error: 'Missing signature or timestamp' });
+    }
+
+    // PHASE 15: Validate timestamp to prevent replay attacks
+    const currentTime = Math.floor(Date.now() / 1000);
+    const webhookTime = parseInt(timestamp);
+    const timeDifference = Math.abs(currentTime - webhookTime);
+    
+    // Reject webhooks older than 5 minutes (300 seconds)
+    if (timeDifference > 300) {
+      console.error('Webhook timestamp too old:', { timeDifference, webhookTime, currentTime });
+      return res.status(400).json({ error: 'Webhook timestamp expired' });
     }
 
     // Parse the raw body

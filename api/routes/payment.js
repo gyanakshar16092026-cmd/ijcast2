@@ -202,14 +202,24 @@ router.post('/verify-payment', async (req, res) => {
   }
 });
 
-// Get payment history (optional - for admin purposes)
+// Get payment history (ADMIN ONLY - requires authentication)
 router.get('/history', async (req, res) => {
   try {
-    // This endpoint would require authentication in production
-    // For now, return a simple message
-    res.status(200).json({
-      success: true,
-      message: 'Payment history endpoint - requires authentication'
+    // PHASE 15: SECURITY FIX - This endpoint requires admin authentication
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        error: true,
+        message: 'Authentication required'
+      });
+    }
+
+    // TODO: Implement proper admin token verification with Supabase
+    // For now, return error requiring proper authentication
+    return res.status(403).json({
+      error: true,
+      message: 'Admin authentication required. This endpoint is protected.'
     });
   } catch (error) {
     res.status(500).json({

@@ -48,7 +48,7 @@ export const Home = () => {
             </div>
             <div className="flex items-center space-x-2">
               <TrendingUp className="w-4 h-4 text-emerald-400" />
-              <span className="font-semibold">Impact Factor: 8.234</span>
+              <span className="font-semibold">Impact Factor: {settings.impact_factor || 'TBA'}</span>
             </div>
             <div className="flex items-center space-x-2">
               <BarChart3 className="w-4 h-4 text-blue-400" />
@@ -223,7 +223,7 @@ export const Home = () => {
                 <Award className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">8.234</p>
+                <p className="text-2xl font-bold text-slate-900">{settings.impact_factor || 'TBA'}</p>
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Impact Factor</p>
               </div>
             </div>
