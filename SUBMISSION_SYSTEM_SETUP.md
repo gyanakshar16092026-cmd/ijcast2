@@ -1,0 +1,244 @@
+# Paper Submission System - Database Setup Guide
+
+## ✅ What Has Been Implemented
+
+### 1. Database Integration
+- **JournalContext.jsx** - Added three new functions:
+  - `submitPaper()` - Handles file uploads and database insertion
+  - `fetchSubmissions()` - Retrieves all submissions from database
+  - `updateSubmissionStatus()` - Updates submission status with date tracking
+
+### 2. Frontend Components
+- **SubmitPaper.jsx** - Connected to real database submission
+- **SubmissionsManager.jsx** - Fetches real data from Supabase
+
+### 3. File Upload Integration
+- Files are uploaded to Supabase Storage bucket: `manuscripts`
+- Supports: Manuscript (required), Cover Letter (optional), Copyright Form (optional)
+
+---
+
+## 🚀 Setup Instructions
+
+### Step 1: Update Supabase Credentials ✅ DONE
+You've already updated the `.env` file with your new Supabase credentials.
+
+### Step 2: Run Database Schema
+1. Open your Supabase Dashboard at: https://supabase.com/dashboard
+2. Go to **SQL Editor** in the left sidebar
+3. Click **New Query**
+4. Copy the ENTIRE content from `DATABASE_SCHEMA.sql`
+5. Paste it into the SQL editor
+6. Click **Run** (or press Ctrl+Enter)
+
+This will create:
+- ✅ `submissions` table
+- ✅ `submission_authors` table
+- ✅ `contact_messages` table
+- ✅ All indexes, policies, and helper functions
+- ✅ `generate_submission_id()` function
+
+### Step 3: Create Storage Buckets
+1. In Supabase Dashboard, go to **Storage** in the left sidebar
+2. Click **New bucket**
+
+#### Create these 3 buckets:
+
+**Bucket 1: manuscripts** (Private)
+- Name: `manuscripts`
+- Public: ❌ **OFF** (Private)
+- File size limit: 10 MB
+- Allowed MIME types: 
+  - `application/pdf`
+  - `application/msword`
+  - `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
+
+**Bucket 2: published-papers** (Public)
+- Name: `published-papers`
+- Public: ✅ **ON** (Public)
+- File size limit: 10 MB
+- Allowed MIME types: `application/pdf`
+
+**Bucket 3: journal-images** (Public) - If not exists
+- Name: `journal-images`
+- Public: ✅ **ON** (Public)
+- File size limit: 5 MB
+- Allowed MIME types:
+  - `image/jpeg`
+  - `image/png`
+  - `image/webp`
+
+### Step 4: Test the System
+
+#### Test Submission Form:
+1. Start your dev server: `npm run dev`
+2. Navigate to: http://localhost:5173/submit-paper
+3. Fill out the form completely
+4. Upload a test manuscript file
+5. Submit the form
+6. You should see a success confirmation with a submission ID (Format: RJ-YYYY-####)
+
+#### Test Admin Manager:
+1. Login to admin dashboard with credentials:
+   - Email: `gyanaksharsanskritifoundation@gmail.com`
+   - Password: `gyanaksharsanskritifoundation@.com`
+2. Go to **Paper Submissions** in the sidebar
+3. You should see your test submission
+4. Click the eye icon to view details
+5. Try changing the status dropdown
+6. Verify files can be downloaded
+
+---
+
+## 📊 Database Schema Overview
+
+### submissions table
+Stores main submission information:
+- Primary author details
+- Paper information (title, abstract, keywords)
+- File URLs from Supabase Storage
+- Status tracking (SUBMITTED, UNDER REVIEW, ACCEPTED, etc.)
+- Date tracking (submitted, reviewed, accepted, published)
+
+### submission_authors table
+Stores co-authors (relational):
+- Linked to submissions via `submission_id` (foreign key)
+- Author order tracking
+- Separate entry for each co-author
+
+### contact_messages table
+Stores contact form submissions:
+- Name, email, phone, subject, message
+- Status tracking (NEW, READ, RESPONDED, ARCHIVED)
+
+---
+
+## 🔐 Row Level Security (RLS) Policies
+
+### Public Access:
+- ✅ Anyone can INSERT submissions (for submission form)
+- ✅ Anyone can INSERT co-authors (when submitting)
+
+### Admin Access:
+- ✅ Admin can SELECT, UPDATE, DELETE all submissions
+- ✅ Admin email: `gyanaksharsanskritifoundation@gmail.com`
+
+---
+
+## 🎯 How It Works
+
+### Submission Flow:
+1. User fills out form on `/submit-paper`
+2. User uploads files (manuscript required)
+3. On submit:
+   - Files uploaded to `manuscripts` bucket in Supabase Storage
+   - Submission ID generated using `generate_submission_id()` function
+   - Submission record inserted into `submissions` table
+   - Co-authors (if any) inserted into `submission_authors` table
+   - Success confirmation shown with submission ID
+
+### Admin Management Flow:
+1. Admin logs in to dashboard
+2. Goes to "Paper Submissions" section
+3. `SubmissionsManager` component calls `fetchSubmissions()`
+4. All submissions loaded from database with co-authors
+5. Admin can:
+   - Search by title, author, or submission ID
+   - Filter by status
+   - View full details in modal
+   - Download submitted files
+   - Change status (automatically updates review/accepted/published dates)
+
+---
+
+## 🔧 Technical Details
+
+### File Upload Location:
+- Storage Bucket: `manuscripts`
+- File naming: `{submission_id}-manuscript.{ext}`
+- Example: `RJ-2025-0001-manuscript.pdf`
+
+### Submission ID Format:
+- Pattern: `RJ-YYYY-####`
+- Example: `RJ-2025-0001`
+- Generated by PostgreSQL function: `generate_submission_id()`
+- Auto-increments per year
+
+### Status Options:
+1. **SUBMITTED** - Initial status
+2. **UNDER REVIEW** - Admin changed to review (sets `reviewed_date`)
+3. **REVISION REQUIRED** - Revisions needed
+4. **ACCEPTED** - Paper accepted (sets `accepted_date`)
+5. **REJECTED** - Paper rejected
+6. **PUBLISHED** - Paper published (sets `published_date`)
+
+---
+
+## 🐛 Troubleshooting
+
+### If submission fails:
+1. Check browser console for errors
+2. Verify Supabase credentials in `.env` file
+3. Ensure storage buckets are created
+4. Check database tables exist
+5. Verify RLS policies are enabled
+
+### If files won't upload:
+1. Verify `manuscripts` bucket exists
+2. Check file size (must be < 10MB)
+3. Check file type (PDF, DOC, DOCX only)
+
+### If admin can't see submissions:
+1. Verify you're logged in with admin email
+2. Check RLS policies in Supabase dashboard
+3. Open browser console to see fetch errors
+
+---
+
+## 📝 Next Steps (Future Enhancements)
+
+### Not Yet Implemented:
+1. **Email Notifications**
+   - Send confirmation email to author on submission
+   - Notify admin of new submissions
+   - Requires: SendGrid, AWS SES, or Supabase Edge Functions
+
+2. **Contact Form Database Integration**
+   - `contact_messages` table exists but form not connected yet
+   - Form is at: Contact Us page
+
+3. **Convert Submission to Published Paper**
+   - Button exists in admin modal but not functional yet
+   - Should create entry in `articles` table
+
+4. **Search & Filter in Published Papers Page**
+   - Enhanced archives page with filters
+   - Search by author, keywords, year, volume
+
+---
+
+## ✅ Verification Checklist
+
+Before going to production, verify:
+
+- [ ] Database schema executed successfully
+- [ ] All 3 storage buckets created
+- [ ] Submission form works (test submission)
+- [ ] Admin can view submissions
+- [ ] Files can be downloaded
+- [ ] Status updates work
+- [ ] Submission ID generation works
+- [ ] Co-authors are saved correctly
+- [ ] RLS policies prevent unauthorized access
+
+---
+
+## 🎉 You're Done!
+
+The paper submission system is now fully integrated with your Supabase database. Users can submit papers, and admins can manage them through the dashboard.
+
+**Test it now:**
+1. Go to http://localhost:5173/submit-paper
+2. Submit a test paper
+3. Login to admin and check "Paper Submissions"
+

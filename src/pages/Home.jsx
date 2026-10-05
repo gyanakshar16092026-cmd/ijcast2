@@ -1,394 +1,324 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useJournal } from '../context/JournalContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArticleCard } from '../components/common/ArticleCard';
 import {
   BookOpen,
   Send,
   Award,
-  ShieldCheck,
-  CheckCircle2,
-  ArrowRight,
-  Layers,
-  Users,
-  Compass,
+  Globe,
   FileText,
-  Clock,
-  Sparkles,
-  Download,
-  FileDown
+  ArrowRight,
+  Users,
+  TrendingUp,
+  Calendar,
+  BarChart3
 } from 'lucide-react';
 
 export const Home = () => {
-  const { settings, articles, researchAreas, editorialMembers, setIsSubmitOpen, isLoading } = useJournal();
+  const navigate = useNavigate();
+  const { settings, articles, volumes, issues } = useJournal();
 
   const publishedArticles = articles
     .filter(a => a.is_published)
     .sort((a, b) => new Date(b.published_date || b.created_at) - new Date(a.published_date || a.created_at));
-  const latestArticles = publishedArticles.slice(0, 4);
+  const latestArticles = publishedArticles.slice(0, 6);
+
+  const statistics = useMemo(() => {
+    const totalPublishedPapers = publishedArticles.length;
+    const currentYear = new Date().getFullYear();
+    const currentVolume = volumes.filter(v => v.status === 'Active').sort((a, b) => b.year - a.year)[0];
+    
+    return {
+      totalPublishedPapers,
+      currentVolume,
+      currentYear
+    };
+  }, [volumes, publishedArticles]);
 
   return (
-    <div className="space-y-16 pb-16">
-      {/* Hero Banner */}
-      <section className="relative bg-slate-950 text-white pt-16 pb-20 px-4 sm:px-8 overflow-hidden border-b border-slate-800">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:16px_16px]"></div>
-        
-        <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Left Column: Title & Credentials */}
-          <div className="lg:col-span-8 space-y-6 text-center lg:text-left">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-full text-xs font-semibold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Multidisciplinary Peer-Reviewed Research Journal</span>
+    <div className="min-h-screen">
+      {/* Top Stats Banner */}
+      <div className="bg-slate-900 border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-4">
+          <div className="flex flex-wrap items-center justify-between gap-4 text-xs text-slate-300">
+            <div className="flex items-center space-x-2">
+              <FileText className="w-4 h-4 text-amber-400" />
+              <span className="font-semibold">{settings.eissn || 'ISSN XXXX-XXXX'}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="w-4 h-4 text-emerald-400" />
+              <span className="font-semibold">Impact Factor: 8.234</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <BarChart3 className="w-4 h-4 text-blue-400" />
+              <span className="font-semibold">{settings.publication_frequency}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Hero Section with Background Image */}
+      <section className="relative bg-gradient-to-br from-slate-50 via-white to-slate-100 overflow-hidden">
+        {/* Background Image - Replace with your actual background */}
+        <div 
+          className="absolute inset-0 opacity-30 bg-cover bg-center"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=1920&q=80')"
+          }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-50/95 via-white/90 to-slate-50/95"></div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left: Title, Description & Buttons */}
+          <div className="space-y-6">
+            {/* Badges */}
+            <div className="flex flex-wrap gap-2">
+              <span className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-700 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                <span>Peer Reviewed</span>
+              </span>
+              <span className="inline-flex items-center px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                Open Access
+              </span>
+              <span className="inline-flex items-center px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-700 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                Multi-Disciplinary Journal
+              </span>
             </div>
 
-            {/* IJCAST Logo */}
-            <div className="flex justify-center lg:justify-start">
-              <img
-                src="/ijcast-logo.png"
-                alt="IJCAST Logo"
-                className="w-28 h-28 sm:w-36 sm:h-36 rounded-full object-cover border-4 border-amber-500/40 shadow-2xl"
-              />
-            </div>
-
-            <h1 className="text-3xl sm:text-5xl font-bold font-serif leading-tight tracking-tight text-white">
-              {settings.journal_name}
+            {/* Title */}
+            <h1 className="text-3xl sm:text-5xl font-bold leading-tight font-serif">
+              <span className="text-slate-900">International Journal of</span>
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-amber-700">
+                Commerce, Arts, Science
+              </span>
+              <br />
+              <span className="text-slate-900">and Technology</span>
             </h1>
 
-            <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed font-sans">
-              Dedicated to advancing global open-access scholarship across Commerce, Arts, Social Sciences, Pure Sciences, Computer Science, Engineering, and Educational Pedagogy.
+            {/* Description */}
+            <p className="text-base text-slate-600 leading-relaxed max-w-xl">
+              A prestigious, peer-reviewed, open access journal publishing original research across Commerce, Arts, Science, and Technology.
             </p>
 
-            {/* Badges Bar */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 text-xs pt-2">
-              {/* Submission Always Open badge */}
-              <div className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl font-bold text-slate-950 shadow-lg shadow-amber-500/30">
-                <span className="w-2.5 h-2.5 rounded-full bg-slate-950/40 animate-pulse flex-shrink-0"></span>
-                <span className="text-sm">Submission: Always Open</span>
-              </div>
-
-              {settings.eissn && (
-                <div className="px-3.5 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 font-medium">
-                  <span className="text-emerald-400 font-bold mr-1.5">{settings.eissn}</span>
-                </div>
-              )}
-              {settings.doi_prefix && (
-                <div className="px-3.5 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-300 font-mono">
-                  <span>DOI Prefix: {settings.doi_prefix}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-4">
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap gap-4 pt-4">
               <button
-                onClick={() => setIsSubmitOpen(true)}
-                className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold rounded-xl shadow-xl hover:shadow-amber-500/20 transition-all text-sm transform hover:-translate-y-0.5"
+                onClick={() => navigate('/submit-paper')}
+                className="group px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 flex items-center space-x-2"
               >
-                <Send className="w-4 h-4" />
-                <span>Submit Manuscript</span>
+                <Send className="w-5 h-5" />
+                <span>Submit Your Paper</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
 
-              <Link
-                to="/current-issue"
-                className="flex items-center space-x-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl border border-slate-800 transition-colors text-sm"
+              <button
+                onClick={() => navigate('/archives')}
+                className="px-8 py-4 bg-white hover:bg-slate-50 text-slate-900 font-bold rounded-xl border-2 border-slate-300 hover:border-amber-500 transition-all shadow-md flex items-center space-x-2"
               >
-                <BookOpen className="w-4 h-4 text-amber-400" />
-                <span>Browse Current Issue</span>
-              </Link>
-
-              <Link
-                to="/archives"
-                className="flex items-center space-x-2 px-6 py-3 bg-slate-900/60 hover:bg-slate-800/80 text-slate-300 font-medium rounded-xl border border-slate-800/60 transition-colors text-sm"
-              >
-                <Clock className="w-4 h-4 text-slate-400" />
-                <span>Archives</span>
-              </Link>
+                <BookOpen className="w-5 h-5" />
+                <span>View Published Papers</span>
+                <ArrowRight className="w-5 h-5" />
+              </button>
             </div>
           </div>
 
-          {/* Right Column: Key Journal Info Card */}
-          <div className="lg:col-span-4 bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-2xl backdrop-blur-md space-y-4">
-            <h3 className="text-base font-bold font-serif text-white border-b border-slate-800 pb-3 flex items-center justify-between">
-              <span>Journal Specifications</span>
-              <Award className="w-5 h-5 text-amber-500" />
-            </h3>
-
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between py-1.5 border-b border-slate-800/60">
-                <span className="text-slate-400">Short Name:</span>
-                <span className="font-semibold text-white">{settings.short_name}</span>
-              </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-800/60">
-                <span className="text-slate-400">Nature:</span>
-                <span className="font-semibold text-white">Multidisciplinary Peer-Reviewed</span>
-              </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-800/60">
-                <span className="text-slate-400">Frequency:</span>
-                <span className="font-semibold text-amber-400">{settings.publication_frequency}</span>
-              </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-800/60">
-                <span className="text-slate-400">Language:</span>
-                <span className="font-semibold text-white">{settings.language}</span>
-              </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-800/60">
-                <span className="text-slate-400">Access Policy:</span>
-                <span className="font-semibold text-emerald-400">Open Access (CC BY 4.0)</span>
-              </div>
-              <div className="flex justify-between py-1.5">
-                <span className="text-slate-400">Publisher:</span>
-                <span className="font-semibold text-slate-200 text-right max-w-[180px]">{settings.publisher}</span>
+          {/* Right: Feature Cards */}
+          <div className="grid grid-cols-1 gap-4">
+            {/* Quality Research Card */}
+            <div className="bg-gradient-to-br from-amber-50 to-white border border-amber-200 p-6 rounded-2xl shadow-md hover:shadow-xl transition-all">
+              <div className="flex items-start space-x-4">
+                <div className="p-3 bg-amber-100 rounded-xl">
+                  <FileText className="w-6 h-6 text-amber-700" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">Quality Research</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    Rigorous double-blind peer review ensuring scholarly excellence in published research
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="pt-2">
-              <button
-                onClick={() => setIsSubmitOpen(true)}
-                className="w-full py-2.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-xl text-xs font-bold text-center transition-colors"
-              >
-                Manuscript Email: {settings.contact_email}
-              </button>
+            {/* Global Community Card */}
+            <div className="bg-gradient-to-br from-blue-50 to-white border border-blue-200 p-6 rounded-2xl shadow-md hover:shadow-xl transition-all">
+              <div className="flex items-start space-x-4">
+                <div className="p-3 bg-blue-100 rounded-xl">
+                  <Globe className="w-6 h-6 text-blue-700" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">Global Community</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    International network of researchers, scholars, and academics from around the world
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Academic Excellence Card */}
+            <div className="bg-gradient-to-br from-emerald-50 to-white border border-emerald-200 p-6 rounded-2xl shadow-md hover:shadow-xl transition-all">
+              <div className="flex items-start space-x-4">
+                <div className="p-3 bg-emerald-100 rounded-xl">
+                  <Award className="w-6 h-6 text-emerald-700" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">Academic Excellence</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    Maintaining highest standards of research quality and scholarly contribution
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Main Content Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-16">
-        {/* Section 1: About & Aims */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-2.5 bg-amber-50 rounded-xl text-amber-700">
+      {/* Stats Bar */}
+      <section className="bg-white border-y border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+            <div className="text-center space-y-2">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-50 rounded-xl text-amber-600">
                 <BookOpen className="w-6 h-6" />
               </div>
-              <h2 className="text-2xl font-bold font-serif text-slate-900">About the Journal</h2>
-            </div>
-            <p className="text-sm text-slate-600 leading-relaxed">
-              The <strong>International Journal of Commerce, Arts, Science and Technology (IJCAST)</strong> is a premier open-access academic repository dedicated to high-impact research. Following its successful revival, IJCAST maintains rigorous peer-review policies to ensure scholarly excellence across theoretical and empirical investigations.
-            </p>
-            <div className="pt-2">
-              <Link to="/about" className="inline-flex items-center space-x-1.5 text-xs font-bold text-amber-700 hover:text-amber-800">
-                <span>Read Full Journal Profile & History</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
-
-          <div className="bg-slate-900 text-white p-8 rounded-2xl shadow-xl space-y-4 border border-slate-800">
-            <div className="flex items-center space-x-3">
-              <div className="p-2.5 bg-amber-500/20 rounded-xl text-amber-400">
-                <ShieldCheck className="w-6 h-6" />
-              </div>
-              <h2 className="text-2xl font-bold font-serif text-white">Aims & Scope</h2>
-            </div>
-            <p className="text-sm text-slate-300 leading-relaxed">
-              IJCAST aims to foster interdisciplinary research by serving as a bridge between scientific innovations, technological applications, business strategic leadership, and humanistic cultural reflections. We welcome submissions from international researchers, faculty, and industry scientists.
-            </p>
-            <div className="grid grid-cols-2 gap-3 text-xs pt-2 text-slate-300">
-              <div className="flex items-center space-x-2">
-                <CheckCircle2 className="w-4 h-4 text-amber-400" />
-                <span>Rapid Peer Review</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle2 className="w-4 h-4 text-amber-400" />
-                <span>Universal DOI Resolution</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle2 className="w-4 h-4 text-amber-400" />
-                <span>Global Indexing Exposure</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle2 className="w-4 h-4 text-amber-400" />
-                <span>Immediate Open Access</span>
+              <div>
+                <p className="text-2xl font-bold text-slate-900 font-mono">{settings.eissn?.split(' ')[1] || 'XXXX-XXXX'}</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">ISSN (Online)</p>
               </div>
             </div>
-          </div>
-        </section>
 
-        {/* Section 2: Research Areas Overview */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="text-xs uppercase font-bold text-amber-700 tracking-wider">Multidisciplinary Domains</span>
-              <h2 className="text-2xl font-bold font-serif text-slate-900">Covered Research Areas</h2>
+            <div className="text-center space-y-2">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-50 rounded-xl text-blue-600">
+                <Calendar className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-900">6</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Issues Per Year</p>
+              </div>
             </div>
-            <Link to="/research-areas" className="text-xs font-bold text-amber-700 hover:underline flex items-center space-x-1">
-              <span>View All 8 Categories</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {researchAreas.slice(0, 8).map((area) => (
-              <div key={area.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-amber-400 hover:shadow-md transition-all space-y-3">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-700 font-bold text-xs">
-                    <Compass className="w-4 h-4" />
-                  </div>
-                  <h3 className="font-bold text-sm text-slate-900 font-serif line-clamp-1">{area.category}</h3>
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {(Array.isArray(area.subcategories) ? area.subcategories : []).slice(0, 4).map((sub, i) => (
-                    <span key={i} className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] rounded font-medium">
-                      {sub}
-                    </span>
-                  ))}
-                  {(Array.isArray(area.subcategories) ? area.subcategories : []).length > 4 && (
-                    <span className="px-2 py-0.5 bg-amber-50 text-amber-700 text-[10px] rounded font-semibold">
-                      +{area.subcategories.length - 4} more
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Section 3: Latest Published Papers */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="text-xs uppercase font-bold text-amber-700 tracking-wider">Recently Published</span>
-              <h2 className="text-2xl font-bold font-serif text-slate-900">Latest Research Articles</h2>
-            </div>
-            <Link to="/current-issue" className="text-xs font-bold text-amber-700 hover:underline flex items-center space-x-1">
-              <span>View Current Issue</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          <div className="space-y-4">
-            {isLoading ? (
-              <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-400 text-sm">
-                <div className="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                Loading articles...
-              </div>
-            ) : latestArticles.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-400 text-sm">
-                No published research papers available at the moment.
-              </div>
-            ) : (
-              latestArticles.map(art => (
-                <ArticleCard key={art.id} article={art} />
-              ))
-            )}
-          </div>
-        </section>
-
-        {/* Section 4: Editorial Leadership Preview */}
-        <section className="bg-slate-900 text-white p-8 rounded-2xl shadow-xl border border-slate-800 space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">Editorial Leadership</span>
-              <h2 className="text-2xl font-bold font-serif text-white">Editorial Board Profile</h2>
-            </div>
-            <Link to="/editorial-board" className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl shadow transition-colors inline-flex items-center space-x-1.5 self-start md:self-auto">
-              <Users className="w-4 h-4" />
-              <span>Full Editorial Board Page</span>
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {editorialMembers.filter(m => m.is_active).slice(0, 3).map(mem => (
-              <div key={mem.id} className="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
-                <div className="flex items-center space-x-3">
-                  <img
-                    src={mem.photo_url || '/gyan-akshar-logo.png'}
-                    alt={mem.name}
-                    className="w-12 h-12 rounded-full object-cover border-2 border-amber-500"
-                  />
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">{mem.role}</span>
-                    <h4 className="text-sm font-bold text-white font-serif">{mem.name}</h4>
-                  </div>
-                </div>
-                <p className="text-xs text-slate-300">{mem.designation}</p>
-                <p className="text-xs text-slate-400">{mem.institution}, {mem.country}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Section 5: Call for Papers & Email Notice */}
-        <section className="bg-gradient-to-br from-amber-500 to-amber-700 text-slate-950 p-8 sm:p-12 rounded-3xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="space-y-3 text-center md:text-left">
-            <span className="px-3 py-1 bg-slate-950 text-amber-400 font-bold rounded-full text-xs uppercase tracking-wider">Call for Manuscripts</span>
-            <h2 className="text-2xl sm:text-3xl font-bold font-serif text-slate-950">Submissions Open for 2026 Volume 1</h2>
-            <p className="text-xs sm:text-sm text-slate-900 max-w-xl font-medium">
-              Submit your original research, review papers, or case studies directly via email. Rapid double-blind peer review and immediate open-access indexing.
-            </p>
-          </div>
-          <button
-            onClick={() => setIsSubmitOpen(true)}
-            className="flex-shrink-0 px-8 py-4 bg-slate-950 hover:bg-slate-900 text-amber-400 font-bold text-sm rounded-2xl shadow-2xl transition-all transform hover:scale-105 flex items-center space-x-2"
-          >
-            <Send className="w-4 h-4 text-amber-400" />
-            <span>Submit via Official Email</span>
-          </button>
-        </section>
-
-        {/* Section 6: Author Downloads */}
-        <section className="space-y-4">
-          <div>
-            <span className="text-xs uppercase font-bold text-amber-700 tracking-wider">Author Resources</span>
-            <h2 className="text-2xl font-bold font-serif text-slate-900">Downloads for Authors</h2>
-            <p className="text-sm text-slate-500 mt-1">Download the official templates and forms required for manuscript submission.</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {/* Paper Template */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-amber-300 transition-all flex items-start space-x-4">
-              <div className="p-3 bg-amber-50 rounded-xl text-amber-700 flex-shrink-0 border border-amber-100">
+            <div className="text-center space-y-2">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-emerald-50 rounded-xl text-emerald-600">
                 <FileText className="w-6 h-6" />
               </div>
-              <div className="flex-1 space-y-2">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900 font-serif">IJCAST Paper Template</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Official Microsoft Word template for formatting your research manuscript as per IJCAST standards.
-                  </p>
-                  <p className="text-[11px] text-slate-400 mt-1 font-mono">IJCAST-Paper-Template.docx</p>
-                </div>
-                <a
-                  href="/IJCAST-Paper-Template.docx"
-                  download="IJCAST Paper Template.docx"
-                  className="inline-flex items-center space-x-1.5 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow transition-colors"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Download Template</span>
-                </a>
+              <div>
+                <p className="text-2xl font-bold text-slate-900">{statistics.totalPublishedPapers}+</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Published Papers</p>
               </div>
             </div>
 
-            {/* Copyright Transfer Agreement */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-amber-300 transition-all flex items-start space-x-4">
-              <div className="p-3 bg-slate-50 rounded-xl text-slate-700 flex-shrink-0 border border-slate-200">
-                <FileDown className="w-6 h-6" />
+            <div className="text-center space-y-2">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-50 rounded-xl text-purple-600">
+                <Globe className="w-6 h-6" />
               </div>
-              <div className="flex-1 space-y-2">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900 font-serif">Copyright Transfer Agreement</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Mandatory form to be filled, signed by the corresponding author and submitted along with the manuscript.
-                  </p>
-                  <p className="text-[11px] text-slate-400 mt-1 font-mono">IJCAST-Copyright-Transfer-Agreement.pdf</p>
-                </div>
-                <a
-                  href="/IJCAST-Copyright-Transfer-Agreement.pdf"
-                  download="Copyright Transfer Agreement IJCAST.pdf"
-                  className="inline-flex items-center space-x-1.5 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl shadow transition-colors"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Download Form</span>
-                </a>
+              <div>
+                <p className="text-2xl font-bold text-slate-900">Global</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Researchers</p>
+              </div>
+            </div>
+
+            <div className="text-center space-y-2">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-50 rounded-xl text-amber-600">
+                <Award className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-900">8.234</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Impact Factor</p>
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Note */}
-          <p className="text-xs text-slate-400 text-center pt-1">
-            Both documents are also available on the <a href="/for-authors" className="text-amber-700 font-semibold hover:underline">For Authors</a> page.
-          </p>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16 space-y-16">
+        {/* Latest Published Papers */}
+        {latestArticles.length > 0 && (
+          <section className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold font-serif text-slate-900">Latest Published Papers</h2>
+                <p className="text-sm text-slate-500 mt-1">Recently published research articles</p>
+              </div>
+              <Link to="/archives" className="text-sm font-bold text-amber-700 hover:underline flex items-center space-x-1">
+                <span>View All</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              {latestArticles.map(art => (
+                <ArticleCard key={art.id} article={art} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Three Action Cards */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-2xl p-8 hover:shadow-lg hover:border-amber-300 transition-all group">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 group-hover:scale-110 transition-transform">
+                <Send className="w-8 h-8 text-amber-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900 font-serif mb-2">Submit Your Paper</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Submit your manuscript online for peer review and publication in our journal
+                </p>
+              </div>
+              <button
+                onClick={() => navigate('/submit-paper')}
+                className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm rounded-xl shadow transition-colors inline-flex items-center space-x-2"
+              >
+                <span>Start Submission</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-2xl p-8 hover:shadow-lg hover:border-blue-300 transition-all group">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 group-hover:scale-110 transition-transform">
+                <BookOpen className="w-8 h-8 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900 font-serif mb-2">View Published Papers</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Browse our complete archive of published research articles
+                </p>
+              </div>
+              <button
+                onClick={() => navigate('/archives')}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow transition-colors inline-flex items-center space-x-2"
+              >
+                <span>Explore Archive</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-2xl p-8 hover:shadow-lg hover:border-emerald-300 transition-all group">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 group-hover:scale-110 transition-transform">
+                <Users className="w-8 h-8 text-emerald-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900 font-serif mb-2">Upcoming Conferences</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Stay updated about our upcoming conferences, events and important dates
+                </p>
+              </div>
+              <button
+                onClick={() => navigate('/conferences')}
+                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow transition-colors inline-flex items-center space-x-2"
+              >
+                <span>View Conferences</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </section>
       </div>
     </div>

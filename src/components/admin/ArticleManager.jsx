@@ -112,7 +112,7 @@ export const ArticleManager = () => {
   };
 
   // PDF File Dropzone & Browse Handlers
-  const handlePdfFileSelect = (file) => {
+  const handlePdfFileSelect = async (file) => {
     if (!file) return;
     if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
       alert('Please select a valid PDF manuscript file (.pdf).');
@@ -121,22 +121,75 @@ export const ArticleManager = () => {
 
     setUploadFileName(file.name);
 
-    // Read file into Data URL or Store URL
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const fileUrl = e.target.result;
-      setFormData(prev => ({ ...prev, pdf_url: fileUrl }));
+    // Upload to Supabase Storage instead of using Data URLs
+    try {
+      const { supabase, isSupabaseConfigured } = await import('../../lib/supabase');
+      
+      if (isSupabaseConfigured && supabase) {
+        // Generate unique filename
+        const timestamp = Date.now();
+        const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const fileName = `${timestamp}-${sanitizedName}`;
+        
+        // Upload to published-papers bucket
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('published-papers')
+          .upload(fileName, file, {
+            contentType: 'application/pdf',
+            upsert: true
+          });
 
-      // Register file in Media Manager
-      addMediaItem({
-        filename: file.name,
-        file_type: 'pdf',
-        file_size: file.size,
-        url: fileUrl,
-        bucket_name: 'journal-pdfs'
-      });
-    };
-    reader.readAsDataURL(file);
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('published-papers')
+          .getPublicUrl(fileName);
+
+        setFormData(prev => ({ ...prev, pdf_url: publicUrl }));
+
+        // Register file in Media Manager
+        addMediaItem({
+          filename: file.name,
+          file_type: 'pdf',
+          file_size: file.size,
+          url: publicUrl,
+          bucket_name: 'published-papers'
+        });
+
+        alert('PDF uploaded successfully to Supabase Storage!');
+      } else {
+        // Fallback to Data URL for offline mode
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const fileUrl = e.target.result;
+          setFormData(prev => ({ ...prev, pdf_url: fileUrl }));
+
+          // Register file in Media Manager
+          addMediaItem({
+            filename: file.name,
+            file_type: 'pdf',
+            file_size: file.size,
+            url: fileUrl,
+            bucket_name: 'journal-pdfs'
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    } catch (error) {
+      console.error('PDF upload failed:', error);
+      alert(`Upload failed: ${error.message}. Using fallback mode.`);
+      
+      // Fallback to Data URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const fileUrl = e.target.result;
+        setFormData(prev => ({ ...prev, pdf_url: fileUrl }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleDrag = (e) => {

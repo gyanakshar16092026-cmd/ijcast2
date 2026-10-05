@@ -135,8 +135,8 @@ export const JournalProvider = ({ children }) => {
             publisher: (set.publisher === 'IJCAST Academic Research Publications Group' || !set.publisher)
               ? 'Gyan Akshar Sanskriti Foundation'
               : set.publisher,
-            publication_frequency: (set.publication_frequency === 'Bi-Monthly (6 Issues per Year)' || set.publication_frequency === 'Quarterly (4 Issues Per Year) — Issue 1: Jan–Mar | Issue 2: Apr–Jun | Issue 3: Jul–Sep | Issue 4: Oct–Dec' || !set.publication_frequency)
-              ? 'Quarterly (4 Issues Per Year)'
+            publication_frequency: (set.publication_frequency === 'Quarterly (4 Issues Per Year) — Issue 1: Jan–Mar | Issue 2: Apr–Jun | Issue 3: Jul–Sep | Issue 4: Oct–Dec' || set.publication_frequency === 'Quarterly (4 Issues Per Year)' || !set.publication_frequency)
+              ? 'Bimonthly (6 Issues Per Year)'
               : set.publication_frequency,
           };
           setSettings(corrected);
@@ -261,14 +261,46 @@ export const JournalProvider = ({ children }) => {
   };
 
   // Volumes
-  const saveVolume = async (volumeData) => {
+  const saveVolume = async (volumeData, options = {}) => {
+    const { autoGenerateIssues = true } = options;
+    
     if (isSupabaseConfigured && supabase) {
       const isNew = !volumeData.id || volumeData.id.startsWith('vol-');
       if (isNew) {
         const { id: _, ...rest } = volumeData;
         const payload = { ...rest, created_at: new Date().toISOString() };
         const { data: inserted, error } = await supabase.from('volumes').insert(payload).select().single();
-        if (!error && inserted) { setVolumes(prev => [inserted, ...prev]); return; }
+        if (!error && inserted) { 
+          setVolumes(prev => [inserted, ...prev]); 
+          
+          // Auto-generate 6 bimonthly issues for the new volume
+          if (autoGenerateIssues) {
+            const bimonthlyIssues = [
+              { number: 1, month_range: 'Jan–Feb', title: 'Number 1' },
+              { number: 2, month_range: 'Mar–Apr', title: 'Number 2' },
+              { number: 3, month_range: 'May–Jun', title: 'Number 3' },
+              { number: 4, month_range: 'Jul–Aug', title: 'Number 4' },
+              { number: 5, month_range: 'Sep–Oct', title: 'Number 5' },
+              { number: 6, month_range: 'Nov–Dec', title: 'Number 6' },
+            ];
+            
+            for (let i = 0; i < bimonthlyIssues.length; i++) {
+              const issueTemplate = bimonthlyIssues[i];
+              await saveIssue({
+                volume_id: inserted.id,
+                issue_number: issueTemplate.number,
+                month_range: issueTemplate.month_range,
+                year: inserted.year,
+                pub_date: '',
+                cover_url: '',
+                editorial_note: `${issueTemplate.title} - ${issueTemplate.month_range} ${inserted.year}`,
+                sort_order: i + 1
+              });
+            }
+          }
+          
+          return;
+        }
       } else {
         await supabase.from('volumes').update(volumeData).eq('id', volumeData.id);
         setVolumes(prev => prev.map(v => v.id === volumeData.id ? { ...v, ...volumeData } : v)); return;
@@ -278,7 +310,34 @@ export const JournalProvider = ({ children }) => {
     if (volumeData.id && !volumeData.id.startsWith('vol-')) {
       setVolumes(prev => prev.map(v => v.id === volumeData.id ? { ...v, ...volumeData } : v));
     } else {
-      setVolumes(prev => [{ ...volumeData, id: `vol-${Date.now()}`, created_at: new Date().toISOString() }, ...prev]);
+      const newVol = { ...volumeData, id: `vol-${Date.now()}`, created_at: new Date().toISOString() };
+      setVolumes(prev => [newVol, ...prev]);
+      
+      // Auto-generate 6 bimonthly issues for the new volume (offline mode)
+      if (autoGenerateIssues) {
+        const bimonthlyIssues = [
+          { number: 1, month_range: 'Jan–Feb', title: 'Number 1' },
+          { number: 2, month_range: 'Mar–Apr', title: 'Number 2' },
+          { number: 3, month_range: 'May–Jun', title: 'Number 3' },
+          { number: 4, month_range: 'Jul–Aug', title: 'Number 4' },
+          { number: 5, month_range: 'Sep–Oct', title: 'Number 5' },
+          { number: 6, month_range: 'Nov–Dec', title: 'Number 6' },
+        ];
+        
+        for (let i = 0; i < bimonthlyIssues.length; i++) {
+          const issueTemplate = bimonthlyIssues[i];
+          await saveIssue({
+            volume_id: newVol.id,
+            issue_number: issueTemplate.number,
+            month_range: issueTemplate.month_range,
+            year: newVol.year,
+            pub_date: '',
+            cover_url: '',
+            editorial_note: `${issueTemplate.title} - ${issueTemplate.month_range} ${newVol.year}`,
+            sort_order: i + 1
+          });
+        }
+      }
     }
   };
 
@@ -588,6 +647,182 @@ export const JournalProvider = ({ children }) => {
     }
   };
 
+  // Paper Submissions
+  const submitPaper = async (submissionData, files) => {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error('Supabase is not configured. Cannot submit paper.');
+    }
+
+    try {
+      // 1. Generate submission ID using database function
+      const { data: idData, error: idError } = await supabase.rpc('generate_submission_id');
+      if (idError) throw new Error('Failed to generate submission ID');
+      const submissionId = idData;
+
+      // 2. Upload files to Supabase Storage
+      let manuscriptUrl = null, manuscriptFilename = null;
+      let coverLetterUrl = null, coverLetterFilename = null;
+      let copyrightUrl = null, copyrightFilename = null;
+
+      if (files.manuscript_file) {
+        const ext = files.manuscript_file.name.split('.').pop();
+        const fileName = `${submissionId}-manuscript.${ext}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('manuscripts')
+          .upload(fileName, files.manuscript_file, { 
+            contentType: files.manuscript_file.type,
+            upsert: true 
+          });
+        if (uploadError) throw new Error('Failed to upload manuscript file');
+        const { data: { publicUrl } } = supabase.storage.from('manuscripts').getPublicUrl(fileName);
+        manuscriptUrl = publicUrl;
+        manuscriptFilename = files.manuscript_file.name;
+      }
+
+      if (files.cover_letter_file) {
+        const ext = files.cover_letter_file.name.split('.').pop();
+        const fileName = `${submissionId}-cover-letter.${ext}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('manuscripts')
+          .upload(fileName, files.cover_letter_file, { 
+            contentType: files.cover_letter_file.type,
+            upsert: true 
+          });
+        if (!uploadError) {
+          const { data: { publicUrl } } = supabase.storage.from('manuscripts').getPublicUrl(fileName);
+          coverLetterUrl = publicUrl;
+          coverLetterFilename = files.cover_letter_file.name;
+        }
+      }
+
+      if (files.copyright_file) {
+        const ext = files.copyright_file.name.split('.').pop();
+        const fileName = `${submissionId}-copyright.${ext}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('manuscripts')
+          .upload(fileName, files.copyright_file, { 
+            contentType: files.copyright_file.type,
+            upsert: true 
+          });
+        if (!uploadError) {
+          const { data: { publicUrl } } = supabase.storage.from('manuscripts').getPublicUrl(fileName);
+          copyrightUrl = publicUrl;
+          copyrightFilename = files.copyright_file.name;
+        }
+      }
+
+      // 3. Insert submission record
+      const { data: submission, error: submissionError } = await supabase
+        .from('submissions')
+        .insert({
+          submission_id: submissionId,
+          author_name: submissionData.author_name,
+          author_email: submissionData.author_email,
+          author_phone: submissionData.author_phone,
+          author_affiliation: submissionData.author_affiliation,
+          author_institution: submissionData.author_institution,
+          author_country: submissionData.author_country,
+          paper_title: submissionData.paper_title,
+          abstract: submissionData.abstract,
+          keywords: submissionData.keywords,
+          manuscript_file_url: manuscriptUrl,
+          manuscript_filename: manuscriptFilename,
+          cover_letter_file_url: coverLetterUrl,
+          cover_letter_filename: coverLetterFilename,
+          copyright_file_url: copyrightUrl,
+          copyright_filename: copyrightFilename,
+          status: 'SUBMITTED',
+        })
+        .select()
+        .single();
+
+      if (submissionError) throw submissionError;
+
+      // 4. Insert co-authors if any
+      if (submissionData.coAuthors && submissionData.coAuthors.length > 0) {
+        const coAuthorsData = submissionData.coAuthors.map((ca, idx) => ({
+          submission_id: submission.id,
+          name: ca.name,
+          email: ca.email,
+          affiliation: ca.affiliation || '',
+          institution: ca.institution || '',
+          country: ca.country || '',
+          author_order: idx + 2, // Primary author is 1, co-authors start at 2
+        }));
+
+        const { error: coAuthorsError } = await supabase
+          .from('submission_authors')
+          .insert(coAuthorsData);
+
+        if (coAuthorsError) console.warn('Failed to insert co-authors:', coAuthorsError);
+      }
+
+      return { success: true, submissionId, submission };
+    } catch (error) {
+      console.error('Submission error:', error);
+      throw error;
+    }
+  };
+
+  const fetchSubmissions = async () => {
+    if (!isSupabaseConfigured || !supabase) return [];
+
+    try {
+      // Fetch submissions with co-author count
+      const { data: submissions, error } = await supabase
+        .from('submissions')
+        .select(`
+          *,
+          submission_authors (
+            id,
+            name,
+            email,
+            affiliation,
+            institution,
+            country,
+            author_order
+          )
+        `)
+        .order('submitted_date', { ascending: false });
+
+      if (error) throw error;
+
+      // Transform data to include coAuthors array
+      return submissions.map(sub => ({
+        ...sub,
+        coAuthors: sub.submission_authors || [],
+      }));
+    } catch (error) {
+      console.error('Failed to fetch submissions:', error);
+      return [];
+    }
+  };
+
+  const updateSubmissionStatus = async (submissionId, newStatus) => {
+    if (!isSupabaseConfigured || !supabase) return;
+
+    try {
+      const updateData = { status: newStatus };
+      
+      // Add date tracking for status changes
+      if (newStatus === 'UNDER REVIEW') updateData.reviewed_date = new Date().toISOString();
+      if (newStatus === 'ACCEPTED') updateData.accepted_date = new Date().toISOString();
+      if (newStatus === 'PUBLISHED') updateData.published_date = new Date().toISOString();
+
+      const { error } = await supabase
+        .from('submissions')
+        .update(updateData)
+        .eq('id', submissionId);
+
+      if (error) throw error;
+
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to update submission status:', error);
+      throw error;
+    }
+  };
+
   // Sync all local articles to Supabase (one-time migration)
   const syncArticlesToSupabase = async () => {
     if (!isSupabaseConfigured || !supabase) return { success: false, message: 'Supabase not configured' };
@@ -750,7 +985,11 @@ export const JournalProvider = ({ children }) => {
     toggleAnnouncement,
     conferences,
     saveConference,
-    deleteConference
+    deleteConference,
+    // Paper Submissions
+    submitPaper,
+    fetchSubmissions,
+    updateSubmissionStatus
   };
 
   return (

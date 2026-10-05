@@ -35,6 +35,7 @@ import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { NotFound } from './pages/NotFound';
 import { Theses } from './pages/Theses';
 import { Conferences } from './pages/Conferences';
+import { SubmitPaper } from './pages/SubmitPaper';
 import { ScrollToTop } from './components/common/ScrollToTop';
 
 // Layout wrapper for Public pages
@@ -69,8 +70,10 @@ export default function App() {
           <Route path="/about" element={<PublicLayout><About /></PublicLayout>} />
           <Route path="/editorial-board" element={<PublicLayout><EditorialBoard /></PublicLayout>} />
           <Route path="/for-authors" element={<PublicLayout><ForAuthors /></PublicLayout>} />
+          <Route path="/published-papers" element={<PublicLayout><Archives /></PublicLayout>} />
           <Route path="/current-issue" element={<PublicLayout><CurrentIssue /></PublicLayout>} />
           <Route path="/archives" element={<PublicLayout><Archives /></PublicLayout>} />
+          <Route path="/submit-paper" element={<PublicLayout><SubmitPaper /></PublicLayout>} />
           <Route path="/article/:id" element={<PublicLayout><ArticleDetail /></PublicLayout>} />
           <Route path="/research-areas" element={<PublicLayout><ResearchAreas /></PublicLayout>} />
           <Route path="/publication-ethics" element={<PublicLayout><PublicationEthics /></PublicLayout>} />

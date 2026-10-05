@@ -49,6 +49,7 @@ export const VolumeManager = () => {
         <div>
           <h2 className="text-xl font-bold font-serif text-white">Volume Management</h2>
           <p className="text-xs text-slate-400">Add, edit, archive, or delete journal volume records.</p>
+          <p className="text-xs text-emerald-400 mt-1">✓ 6 bimonthly issues are automatically created for each new volume</p>
         </div>
         <button
           onClick={handleOpenNew}

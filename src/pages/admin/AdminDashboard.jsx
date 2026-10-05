@@ -13,6 +13,7 @@ import { MediaManager } from '../../components/admin/MediaManager';
 import { SettingsManager } from '../../components/admin/SettingsManager';
 import { ThesisManager } from '../../components/admin/ThesisManager';
 import { AnnouncementManager } from '../../components/admin/AnnouncementManager';
+import { SubmissionsManager } from '../../components/admin/SubmissionsManager';
 import { ConferenceManager } from '../../components/admin/ConferenceManager';
 
 import { FolderTree, BookMarked, FileText, Users, Plus, ArrowRight, ShieldCheck, Menu, RefreshCw, CloudUpload } from 'lucide-react';
@@ -250,6 +251,9 @@ export const AdminDashboard = () => {
 
         {/* Tab 4: Articles */}
         {activeTab === 'articles' && <ArticleManager />}
+
+        {/* Tab 4a: Submissions */}
+        {activeTab === 'submissions' && <SubmissionsManager />}
 
         {/* Tab 4b: Theses */}
         {activeTab === 'theses' && <ThesisManager />}
