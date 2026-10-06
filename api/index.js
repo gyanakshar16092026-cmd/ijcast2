@@ -319,6 +319,12 @@ async function handleCreateOrder(req, res) {
     throw new Error('Failed to create payment record');
   }
 
+  // Auto-detect frontend URL from request
+  const frontendUrl = req.headers.origin || 
+                     req.headers.host ? `https://${req.headers.host}` : 
+                     process.env.VITE_FRONTEND_URL || 
+                     'https://localhost:5173';
+
   // Create Cashfree order
   const cashfreeOrderData = {
     order_id: orderId,
@@ -331,8 +337,8 @@ async function handleCreateOrder(req, res) {
       customer_phone: authorPhone
     },
     order_meta: {
-      return_url: `${process.env.VITE_FRONTEND_URL}/apc-payment/success?order_id=${orderId}`,
-      notify_url: `${process.env.VITE_FRONTEND_URL}/api`
+      return_url: `${frontendUrl}/apc-payment/success?order_id=${orderId}`,
+      notify_url: `${frontendUrl}/api`
     },
     order_note: `IJCAST APC Payment - Manuscript: ${manuscriptId}`
   };
@@ -448,6 +454,11 @@ async function handleAPCCreate(req, res) {
     });
   }
 
+  // Auto-detect frontend URL from request
+  const frontendUrl = req.headers.origin || 
+                     req.headers.host ? `https://${req.headers.host}` : 
+                     'https://localhost:3000';
+
   const cashfreeOrderData = {
     order_id: orderId,
     order_amount: orderAmount,
@@ -459,8 +470,8 @@ async function handleAPCCreate(req, res) {
       customer_phone: customerPhone
     },
     order_meta: {
-      return_url: `${process.env.VITE_FRONTEND_URL}/apc-payment/success`,
-      notify_url: `${process.env.VITE_FRONTEND_URL}/api`
+      return_url: `${frontendUrl}/apc-payment/success`,
+      notify_url: `${frontendUrl}/api`
     },
     order_note: `APC Payment for manuscript ${manuscriptId}`
   };
