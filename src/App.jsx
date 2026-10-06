@@ -31,6 +31,7 @@ import { PaymentSuccess } from './pages/PaymentSuccess';
 import { PaymentFailed } from './pages/PaymentFailed';
 import { APCPayment } from './pages/APCPayment';
 import { APCPaymentSuccess } from './pages/APCPaymentSuccess';
+import { EmailJSTest } from './components/debug/EmailJSTest';
 
 import { AdminLogin } from './pages/admin/AdminLogin';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
@@ -100,6 +101,9 @@ export default function App() {
           {/* APC Payment Routes */}
           <Route path="/apc-payment" element={<PublicLayout><APCPayment /></PublicLayout>} />
           <Route path="/apc-payment/success" element={<PublicLayout><APCPaymentSuccess /></PublicLayout>} />
+
+          {/* Debug Routes */}
+          <Route path="/debug/emailjs" element={<PublicLayout><EmailJSTest /></PublicLayout>} />
 
           {/* 404 catch-all */}
           <Route path="*" element={<NotFound />} />
