@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import { createHash, createHmac } from 'crypto';
 import { supabase } from '../config/supabase-vercel.js';
 import { cashfreeConfig } from '../config/cashfree-vercel.js';
 
@@ -9,8 +9,7 @@ const verifyWebhookSignature = (body, signature, timestamp) => {
 
   try {
     const signatureTime = timestamp + "." + JSON.stringify(body);
-    const computedSignature = crypto
-      .createHmac('sha256', cashfreeConfig.clientSecret)
+    const computedSignature = createHmac('sha256', cashfreeConfig.clientSecret)
       .update(signatureTime)
       .digest('base64');
 
