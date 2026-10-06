@@ -100,7 +100,7 @@ export const APCPayment = () => {
 
     try {
       // Call your API to create Cashfree order
-      const response = await fetch('/api/payment?action=create-order', {
+      const response = await fetch('/api?action=create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1075,7 +1075,7 @@ export const JournalProvider = ({ children }) => {
       console.log('Checking payment status for submission:', submissionId);
       
       // Call the API to check payment status
-      const response = await fetch(`/api/payment?action=status&manuscriptId=${submissionId}`);
+      const response = await fetch(`/api?action=status&manuscriptId=${submissionId}`);
       const result = await response.json();
       
       if (result.success && result.paid) {

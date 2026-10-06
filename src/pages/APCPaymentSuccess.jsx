@@ -20,7 +20,7 @@ export const APCPaymentSuccess = () => {
 
       try {
         // Verify payment with your backend
-        const response = await fetch(`/api/payment?action=apc-verify&order_id=${orderId}&order_token=${orderToken || ''}`);
+        const response = await fetch(`/api?action=apc-verify&order_id=${orderId}&order_token=${orderToken || ''}`);
         const result = await response.json();
         
         if (result.success) {

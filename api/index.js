@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import { createClient } from '@supabase/supabase-js';
+import { createHmac } from 'crypto';
 
 // Supabase configuration
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
@@ -16,7 +17,10 @@ const cashfreeConfig = {
     : 'https://sandbox.cashfree.com'
 };
 
-// Helper functions
+// ================================
+// HELPER FUNCTIONS
+// ================================
+
 const calculateAPCAmount = (authorType, isMember) => {
   if (authorType === 'indian') {
     return {
@@ -86,11 +90,33 @@ const getCashfreePayments = async (orderId) => {
   return await response.json();
 };
 
+const verifyWebhookSignature = (body, signature, timestamp) => {
+  if (!signature || !timestamp) {
+    return false;
+  }
+
+  try {
+    const signatureTime = timestamp + "." + JSON.stringify(body);
+    const computedSignature = createHmac('sha256', cashfreeConfig.clientSecret)
+      .update(signatureTime)
+      .digest('base64');
+
+    return computedSignature === signature;
+  } catch (error) {
+    console.error('Signature verification error:', error);
+    return false;
+  }
+};
+
+// ================================
+// MAIN API HANDLER
+// ================================
+
 export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-webhook-signature, x-webhook-timestamp');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -99,25 +125,110 @@ export default async function handler(req, res) {
   const { action } = req.query;
 
   try {
-    // Handle different payment actions
+    // Route to different handlers based on action or path
     switch (action) {
+      case 'test':
+        return handleTest(req, res);
+      case 'webhook':
+        return handleWebhook(req, res);
       case 'create-order':
-        return await handleCreateOrder(req, res);
+        return handleCreateOrder(req, res);
       case 'verify-payment':
-        return await handleVerifyPayment(req, res);
+        return handleVerifyPayment(req, res);
       case 'apc-create':
-        return await handleAPCCreate(req, res);
+        return handleAPCCreate(req, res);
       case 'apc-verify':
-        return await handleAPCVerify(req, res);
+        return handleAPCVerify(req, res);
       case 'status':
-        return await handleStatus(req, res);
+        return handleStatus(req, res);
       default:
-        return res.status(400).json({ error: 'Invalid action' });
+        // If no action, check if it's a webhook (has signature header)
+        if (req.headers['x-webhook-signature']) {
+          return handleWebhook(req, res);
+        }
+        // Otherwise, default to test endpoint
+        return handleTest(req, res);
     }
   } catch (error) {
-    console.error('Payment API error:', error);
+    console.error('API error:', error);
     res.status(500).json({ error: error.message || 'Internal server error' });
   }
+}
+
+// ================================
+// HANDLER FUNCTIONS
+// ================================
+
+// Test endpoint
+function handleTest(req, res) {
+  res.status(200).json({
+    success: true,
+    message: 'IJCAST API is working',
+    timestamp: new Date().toISOString(),
+    method: req.method,
+    path: req.url,
+    endpoints: {
+      test: 'GET /api?action=test',
+      webhook: 'POST /api?action=webhook',
+      createOrder: 'POST /api?action=create-order',
+      verifyPayment: 'POST /api?action=verify-payment',
+      apcCreate: 'POST /api?action=apc-create',
+      apcVerify: 'GET /api?action=apc-verify',
+      status: 'GET /api?action=status&manuscriptId=X'
+    }
+  });
+}
+
+// Webhook handler
+async function handleWebhook(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const signature = req.headers['x-webhook-signature'];
+  const timestamp = req.headers['x-webhook-timestamp'];
+  
+  console.log('🔔 Cashfree webhook received:', req.body);
+
+  // Verify webhook signature
+  const isValidSignature = verifyWebhookSignature(
+    req.body,
+    signature,
+    timestamp
+  );
+
+  if (!isValidSignature) {
+    console.log('❌ Invalid webhook signature');
+    return res.status(400).json({ message: 'Invalid signature' });
+  }
+
+  const { data } = req.body;
+  const { order } = data;
+
+  // Update payment record based on webhook data
+  if (order.order_status === 'PAID') {
+    await supabase
+      .from('apc_payments')
+      .update({
+        payment_status: 'SUCCESS',
+        cashfree_payment_id: data.payment?.cf_payment_id,
+        payment_method: data.payment?.payment_method
+      })
+      .eq('cashfree_order_id', order.order_id);
+
+    console.log('✅ Payment webhook processed - payment successful:', order.order_id);
+  } else if (order.order_status === 'FAILED') {
+    await supabase
+      .from('apc_payments')
+      .update({
+        payment_status: 'FAILED'
+      })
+      .eq('cashfree_order_id', order.order_id);
+
+    console.log('❌ Payment webhook processed - payment failed:', order.order_id);
+  }
+
+  res.json({ status: 'success' });
 }
 
 // Create payment order
@@ -221,7 +332,7 @@ async function handleCreateOrder(req, res) {
     },
     order_meta: {
       return_url: `${process.env.VITE_FRONTEND_URL}/apc-payment/success?order_id=${orderId}`,
-      notify_url: `${process.env.VITE_FRONTEND_URL}/api/webhook`
+      notify_url: `${process.env.VITE_FRONTEND_URL}/api`
     },
     order_note: `IJCAST APC Payment - Manuscript: ${manuscriptId}`
   };
@@ -349,7 +460,7 @@ async function handleAPCCreate(req, res) {
     },
     order_meta: {
       return_url: `${process.env.VITE_FRONTEND_URL}/apc-payment/success`,
-      notify_url: `${process.env.VITE_FRONTEND_URL}/api/webhook`
+      notify_url: `${process.env.VITE_FRONTEND_URL}/api`
     },
     order_note: `APC Payment for manuscript ${manuscriptId}`
   };
