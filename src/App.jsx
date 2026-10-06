@@ -29,6 +29,8 @@ import { Terms } from './pages/Terms';
 import { Refunds } from './pages/Refunds';
 import { PaymentSuccess } from './pages/PaymentSuccess';
 import { PaymentFailed } from './pages/PaymentFailed';
+import { APCPayment } from './pages/APCPayment';
+import { APCPaymentSuccess } from './pages/APCPaymentSuccess';
 
 import { AdminLogin } from './pages/admin/AdminLogin';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
@@ -36,6 +38,7 @@ import { NotFound } from './pages/NotFound';
 import { Theses } from './pages/Theses';
 import { Conferences } from './pages/Conferences';
 import { SubmitPaper } from './pages/SubmitPaper';
+import { LatestPapers } from './pages/LatestPapers';
 import { ScrollToTop } from './components/common/ScrollToTop';
 
 // Layout wrapper for Public pages
@@ -71,6 +74,7 @@ export default function App() {
           <Route path="/editorial-board" element={<PublicLayout><EditorialBoard /></PublicLayout>} />
           <Route path="/for-authors" element={<PublicLayout><ForAuthors /></PublicLayout>} />
           <Route path="/published-papers" element={<PublicLayout><Archives /></PublicLayout>} />
+          <Route path="/latest-papers" element={<PublicLayout><LatestPapers /></PublicLayout>} />
           <Route path="/current-issue" element={<PublicLayout><CurrentIssue /></PublicLayout>} />
           <Route path="/archives" element={<PublicLayout><Archives /></PublicLayout>} />
           <Route path="/submit-paper" element={<PublicLayout><SubmitPaper /></PublicLayout>} />
@@ -92,6 +96,10 @@ export default function App() {
           <Route path="/payment/failed" element={<PaymentFailed />} />
           <Route path="/payment/cancelled" element={<PaymentFailed />} />
           <Route path="/payment/demo-success" element={<PaymentSuccess />} />
+
+          {/* APC Payment Routes */}
+          <Route path="/apc-payment" element={<PublicLayout><APCPayment /></PublicLayout>} />
+          <Route path="/apc-payment/success" element={<PublicLayout><APCPaymentSuccess /></PublicLayout>} />
 
           {/* 404 catch-all */}
           <Route path="*" element={<NotFound />} />

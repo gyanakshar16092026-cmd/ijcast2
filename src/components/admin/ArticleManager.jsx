@@ -33,7 +33,7 @@ export const ArticleManager = () => {
     published_date: new Date().toISOString().split('T')[0],
     doi: '',
     page_numbers: '1–10',
-    references: '',
+    article_references: '',
     pdf_url: '',
     html_content: '',
     is_published: true
@@ -73,7 +73,7 @@ export const ArticleManager = () => {
       published_date: art.published_date || '',
       doi: art.doi || '',
       page_numbers: art.page_numbers || '',
-      references: art.references || '',
+      article_references: art.article_references || '',
       pdf_url: art.pdf_url || '',
       html_content: art.html_content || '',
       is_published: art.is_published ?? true
@@ -723,8 +723,8 @@ export const ArticleManager = () => {
             <label className="block text-xs text-slate-300 mb-1">References List</label>
             <textarea
               rows={3}
-              value={formData.references}
-              onChange={e => setFormData({ ...formData, references: e.target.value })}
+              value={formData.article_references}
+              onChange={e => setFormData({ ...formData, article_references: e.target.value })}
               placeholder="1. Goodfellow, I. (2016)..."
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-mono"
             />

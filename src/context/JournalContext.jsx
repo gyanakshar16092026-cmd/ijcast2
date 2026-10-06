@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase, isSupabaseConfigured, getLocalStore, setLocalStore, STORAGE_KEYS } from '../lib/supabase';
+import { supabase, isSupabaseConfigured, getLocalStore, setLocalStore, STORAGE_KEYS, getPendingLocalSubmissions, updatePendingLocalSubmissionStatus } from '../lib/supabase';
+import { uploadSubmissionFile } from '../lib/submissionUpload';
+import { emailService } from '../services/emailService';
 import {
   initialJournalSettings,
   initialResearchAreas,
@@ -128,21 +130,21 @@ export const JournalProvider = ({ children }) => {
           const corrected = {
             ...set,
             short_name: set.short_name || 'IJCAST',
-            issn: '',
-            eissn: (!set.eissn || set.eissn.includes('2349') || set.eissn === 'e-ISSN XXXX-XXXX') ? 'e-ISSN XXXX-XXXX' : set.eissn,
+            issn: (!set.issn || set.issn === 'ISSN XXXX-XXXX' || set.issn.includes('2349')) ? '2394-9007' : set.issn,
+            eissn: (!set.eissn || set.eissn.includes('2349') || set.eissn === 'e-ISSN XXXX-XXXX') ? '2394-9007' : set.eissn,
             contact_email: (!set.contact_email || set.contact_email === 'editor@ijcast.org' || set.contact_email === 'editor.ijcast@gmail.com' || set.contact_email === 'editor@ijcast.in') ? 'editor.ijcast.in@gmail.com' : set.contact_email,
             alternate_email: '',
             publisher: (set.publisher === 'IJCAST Academic Research Publications Group' || !set.publisher)
               ? 'Gyan Akshar Sanskriti Foundation'
               : set.publisher,
-            publication_frequency: (set.publication_frequency === 'Quarterly (4 Issues Per Year) — Issue 1: Jan–Mar | Issue 2: Apr–Jun | Issue 3: Jul–Sep | Issue 4: Oct–Dec' || set.publication_frequency === 'Quarterly (4 Issues Per Year)' || !set.publication_frequency)
-              ? 'Bimonthly (6 Issues Per Year)'
+            publication_frequency: (set.publication_frequency === 'Quarterly (4 Issues Per Year) — Issue 1: Jan–Mar | Issue 2: Apr–Jun | Issue 3: Jul–Sep | Issue 4: Oct–Dec' || set.publication_frequency === 'Bimonthly (6 Issues Per Year)' || !set.publication_frequency)
+              ? 'Quarterly (4 Issues Per Year)'
               : set.publication_frequency,
           };
           setSettings(corrected);
-          if (corrected.publisher !== set.publisher || corrected.publication_frequency !== set.publication_frequency || corrected.eissn !== set.eissn || set.issn || corrected.contact_email !== set.contact_email) {
+          if (corrected.publisher !== set.publisher || corrected.publication_frequency !== set.publication_frequency || corrected.eissn !== set.eissn || corrected.issn !== set.issn || corrected.contact_email !== set.contact_email) {
             supabase.from('journal_settings').update({
-              issn: '', eissn: corrected.eissn, publisher: corrected.publisher,
+              issn: corrected.issn, eissn: corrected.eissn, publisher: corrected.publisher,
               publication_frequency: corrected.publication_frequency,
               contact_email: 'editor.ijcast.in@gmail.com', alternate_email: '',
             }).eq('id', set.id);
@@ -649,69 +651,93 @@ export const JournalProvider = ({ children }) => {
 
   // Paper Submissions
   const submitPaper = async (submissionData, files) => {
-    if (!isSupabaseConfigured || !supabase) {
-      throw new Error('Supabase is not configured. Cannot submit paper.');
-    }
+    const storageWarnings = [];
+
+    const saveDraftSubmission = (submissionId, submissionRecord, warningMessage) => {
+      try {
+        const stored = JSON.parse(localStorage.getItem(STORAGE_KEYS.PENDING_SUBMISSIONS) || '[]');
+        const entry = {
+          id: `local-${Date.now()}`,
+          submission_id: submissionId,
+          ...submissionRecord,
+          status: 'SUBMITTED',
+          submitted_date: submissionRecord.submitted_date || new Date().toISOString(),
+          saved_locally_at: submissionRecord.saved_locally_at || new Date().toISOString(),
+          warning: warningMessage || 'Saved locally while storage is unavailable.',
+        };
+
+        stored.unshift(entry);
+        localStorage.setItem(STORAGE_KEYS.PENDING_SUBMISSIONS, JSON.stringify(stored.slice(0, 25)));
+        return entry;
+      } catch (localError) {
+        console.warn('Local submission fallback failed:', localError);
+        return null;
+      }
+    };
 
     try {
-      // 1. Generate submission ID using database function
+      if (!isSupabaseConfigured || !supabase) {
+        const fallbackSubmissionId = `RJ-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999)).padStart(4, '0')}`;
+        const fallbackRecord = {
+          author_name: submissionData.author_name,
+          author_email: submissionData.author_email,
+          paper_title: submissionData.paper_title,
+          abstract: submissionData.abstract,
+          keywords: submissionData.keywords,
+        };
+
+        const fallback = saveDraftSubmission(
+          fallbackSubmissionId,
+          fallbackRecord,
+          'Supabase is not configured. Submission was saved locally.'
+        );
+
+        return { success: true, submissionId: fallbackSubmissionId, submission: fallback, storageWarnings, savedLocally: true };
+      }
+
       const { data: idData, error: idError } = await supabase.rpc('generate_submission_id');
       if (idError) throw new Error('Failed to generate submission ID');
       const submissionId = idData;
 
-      // 2. Upload files to Supabase Storage
       let manuscriptUrl = null, manuscriptFilename = null;
       let coverLetterUrl = null, coverLetterFilename = null;
       let copyrightUrl = null, copyrightFilename = null;
 
-      if (files.manuscript_file) {
-        const ext = files.manuscript_file.name.split('.').pop();
-        const fileName = `${submissionId}-manuscript.${ext}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('manuscripts')
-          .upload(fileName, files.manuscript_file, { 
-            contentType: files.manuscript_file.type,
-            upsert: true 
-          });
-        if (uploadError) throw new Error('Failed to upload manuscript file');
-        const { data: { publicUrl } } = supabase.storage.from('manuscripts').getPublicUrl(fileName);
-        manuscriptUrl = publicUrl;
-        manuscriptFilename = files.manuscript_file.name;
+      const uploadResults = await Promise.all([
+        files.manuscript_file
+          ? uploadSubmissionFile({ client: supabase, bucket: 'manuscripts', submissionId, purpose: 'manuscript', file: files.manuscript_file })
+          : Promise.resolve({ url: null, filename: null, status: 'skipped' }),
+        files.cover_letter_file
+          ? uploadSubmissionFile({ client: supabase, bucket: 'manuscripts', submissionId, purpose: 'cover-letter', file: files.cover_letter_file })
+          : Promise.resolve({ url: null, filename: null, status: 'skipped' }),
+        files.copyright_file
+          ? uploadSubmissionFile({ client: supabase, bucket: 'manuscripts', submissionId, purpose: 'copyright', file: files.copyright_file })
+          : Promise.resolve({ url: null, filename: null, status: 'skipped' }),
+      ]);
+
+      const [manuscriptUpload, coverLetterUpload, copyrightUpload] = uploadResults;
+
+      if (manuscriptUpload.status === 'failed') {
+        storageWarnings.push(`Manuscript upload warning: ${manuscriptUpload.error}`);
+      } else {
+        manuscriptUrl = manuscriptUpload.url;
+        manuscriptFilename = manuscriptUpload.filename;
       }
 
-      if (files.cover_letter_file) {
-        const ext = files.cover_letter_file.name.split('.').pop();
-        const fileName = `${submissionId}-cover-letter.${ext}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('manuscripts')
-          .upload(fileName, files.cover_letter_file, { 
-            contentType: files.cover_letter_file.type,
-            upsert: true 
-          });
-        if (!uploadError) {
-          const { data: { publicUrl } } = supabase.storage.from('manuscripts').getPublicUrl(fileName);
-          coverLetterUrl = publicUrl;
-          coverLetterFilename = files.cover_letter_file.name;
-        }
+      if (coverLetterUpload.status === 'failed') {
+        storageWarnings.push(`Cover letter upload warning: ${coverLetterUpload.error}`);
+      } else {
+        coverLetterUrl = coverLetterUpload.url;
+        coverLetterFilename = coverLetterUpload.filename;
       }
 
-      if (files.copyright_file) {
-        const ext = files.copyright_file.name.split('.').pop();
-        const fileName = `${submissionId}-copyright.${ext}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('manuscripts')
-          .upload(fileName, files.copyright_file, { 
-            contentType: files.copyright_file.type,
-            upsert: true 
-          });
-        if (!uploadError) {
-          const { data: { publicUrl } } = supabase.storage.from('manuscripts').getPublicUrl(fileName);
-          copyrightUrl = publicUrl;
-          copyrightFilename = files.copyright_file.name;
-        }
+      if (copyrightUpload.status === 'failed') {
+        storageWarnings.push(`Copyright form upload warning: ${copyrightUpload.error}`);
+      } else {
+        copyrightUrl = copyrightUpload.url;
+        copyrightFilename = copyrightUpload.filename;
       }
 
-      // 3. Insert submission record
       const { data: submission, error: submissionError } = await supabase
         .from('submissions')
         .insert({
@@ -736,9 +762,18 @@ export const JournalProvider = ({ children }) => {
         .select()
         .single();
 
-      if (submissionError) throw submissionError;
+      if (submissionError) {
+        const savedLocally = saveDraftSubmission(submissionId, {
+          author_name: submissionData.author_name,
+          author_email: submissionData.author_email,
+          paper_title: submissionData.paper_title,
+          abstract: submissionData.abstract,
+          keywords: submissionData.keywords,
+          manuscript_filename: manuscriptFilename,
+        }, 'Submission was saved locally because the database insert failed.');
+        return { success: true, submissionId, submission: savedLocally, storageWarnings, savedLocally: true };
+      }
 
-      // 4. Insert co-authors if any
       if (submissionData.coAuthors && submissionData.coAuthors.length > 0) {
         const coAuthorsData = submissionData.coAuthors.map((ca, idx) => ({
           submission_id: submission.id,
@@ -747,7 +782,7 @@ export const JournalProvider = ({ children }) => {
           affiliation: ca.affiliation || '',
           institution: ca.institution || '',
           country: ca.country || '',
-          author_order: idx + 2, // Primary author is 1, co-authors start at 2
+          author_order: idx + 2,
         }));
 
         const { error: coAuthorsError } = await supabase
@@ -757,18 +792,52 @@ export const JournalProvider = ({ children }) => {
         if (coAuthorsError) console.warn('Failed to insert co-authors:', coAuthorsError);
       }
 
-      return { success: true, submissionId, submission };
+      // Send submission notification to editorial team ONLY after successful database storage
+      try {
+        console.log('📧 Sending submission notification to editorial team...');
+        const notificationResult = await emailService.sendSubmissionNotification({
+          submission_id: submissionId,
+          author_name: submissionData.author_name,
+          author_email: submissionData.author_email,
+          paper_title: submissionData.paper_title,
+          abstract: submissionData.abstract,
+          keywords: submissionData.keywords
+        });
+        
+        console.log('📧 Submission notification result:', notificationResult);
+        if (notificationResult.success && notificationResult.method === 'emailjs') {
+          console.log('✅ Editorial team notified successfully via EmailJS');
+        } else if (notificationResult.method === 'console') {
+          console.log('⚠️ Email notification logged to console (EmailJS not configured)');
+        }
+      } catch (emailError) {
+        // Don't fail the submission if email fails - just log the error
+        console.error('⚠️ Failed to send submission notification (submission still succeeded):', emailError);
+      }
+
+      return { success: true, submissionId, submission, storageWarnings, savedLocally: false };
     } catch (error) {
-      console.error('Submission error:', error);
-      throw error;
+      console.error('Submission failed:', error);
+      const fallbackSubmissionId = `RJ-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999)).padStart(4, '0')}`;
+      const savedLocally = saveDraftSubmission(fallbackSubmissionId, {
+        author_name: submissionData.author_name,
+        author_email: submissionData.author_email,
+        paper_title: submissionData.paper_title,
+        abstract: submissionData.abstract,
+        keywords: submissionData.keywords,
+      }, 'Submission was saved locally after a processing error.');
+      return { success: true, submissionId: fallbackSubmissionId, submission: savedLocally, storageWarnings, savedLocally: true };
     }
   };
 
   const fetchSubmissions = async () => {
-    if (!isSupabaseConfigured || !supabase) return [];
+    const localSubmissions = getPendingLocalSubmissions();
+
+    if (!isSupabaseConfigured || !supabase) {
+      return localSubmissions;
+    }
 
     try {
-      // Fetch submissions with co-author count
       const { data: submissions, error } = await supabase
         .from('submissions')
         .select(`
@@ -787,39 +856,244 @@ export const JournalProvider = ({ children }) => {
 
       if (error) throw error;
 
-      // Transform data to include coAuthors array
-      return submissions.map(sub => ({
+      const normalizedDb = (submissions || []).map(sub => ({
         ...sub,
         coAuthors: sub.submission_authors || [],
       }));
+
+      const merged = [...normalizedDb, ...localSubmissions];
+      const submissionMap = new Map();
+
+      merged.forEach((sub) => {
+        const key = (sub.submission_id || sub.id || '').toString();
+        if (!key) return;
+
+        const candidate = {
+          ...sub,
+          submitted_date: sub.submitted_date || sub.saved_locally_at || new Date().toISOString(),
+          coAuthors: Array.isArray(sub.coAuthors) ? sub.coAuthors : [],
+        };
+
+        const existing = submissionMap.get(key);
+        if (!existing || (existing.id && String(existing.id).startsWith('local-') && !(String(sub.id).startsWith('local-')))) {
+          submissionMap.set(key, candidate);
+        } else if (!existing) {
+          submissionMap.set(key, candidate);
+        }
+      });
+
+      return [...submissionMap.values()].sort((a, b) => new Date(b.submitted_date || 0) - new Date(a.submitted_date || 0));
     } catch (error) {
       console.error('Failed to fetch submissions:', error);
-      return [];
+      return localSubmissions;
     }
   };
 
   const updateSubmissionStatus = async (submissionId, newStatus) => {
-    if (!isSupabaseConfigured || !supabase) return;
+    if (!submissionId) {
+      throw new Error('Submission ID is required');
+    }
+
+    if (String(submissionId).startsWith('local-')) {
+      const updated = updatePendingLocalSubmissionStatus(submissionId, newStatus);
+      if (updated) return { success: true };
+      throw new Error('Local submission could not be updated');
+    }
+
+    if (!isSupabaseConfigured || !supabase) {
+      const fallbackUpdated = updatePendingLocalSubmissionStatus(submissionId, newStatus);
+      if (fallbackUpdated) return { success: true };
+      return { success: false };
+    }
 
     try {
       const updateData = { status: newStatus };
-      
-      // Add date tracking for status changes
+
       if (newStatus === 'UNDER REVIEW') updateData.reviewed_date = new Date().toISOString();
       if (newStatus === 'ACCEPTED') updateData.accepted_date = new Date().toISOString();
       if (newStatus === 'PUBLISHED') updateData.published_date = new Date().toISOString();
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('submissions')
         .update(updateData)
-        .eq('id', submissionId);
+        .eq('id', submissionId)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        const localUpdated = updatePendingLocalSubmissionStatus(submissionId, newStatus);
+        if (localUpdated) return { success: true };
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        const localUpdated = updatePendingLocalSubmissionStatus(submissionId, newStatus);
+        if (localUpdated) return { success: true };
+      }
 
       return { success: true };
     } catch (error) {
       console.error('Failed to update submission status:', error);
       throw error;
+    }
+  };
+
+  const convertSubmissionToPublishedArticle = async (submission) => {
+    if (!submission) {
+      throw new Error('Submission is required');
+    }
+
+    const duplicate = articles.some((article) => {
+      const titleMatch = article.title && article.title.toLowerCase() === (submission.paper_title || '').toLowerCase();
+      const doiMatch = article.doi && submission.submission_id && article.doi.includes(submission.submission_id);
+      return titleMatch || doiMatch;
+    });
+
+    if (duplicate) {
+      await updateSubmissionStatus(submission.id || submission.submission_id, 'PUBLISHED');
+      return { success: true, duplicated: true };
+    }
+
+    const authors = [
+      {
+        name: submission.author_name || 'Author',
+        affiliation: submission.author_affiliation || submission.author_institution || '',
+        email: submission.author_email || '',
+        orcid: '',
+        is_corresponding: true,
+      },
+      ...(Array.isArray(submission.coAuthors) ? submission.coAuthors.map((coAuthor) => ({
+        name: coAuthor.name || '',
+        affiliation: coAuthor.affiliation || coAuthor.institution || '',
+        email: coAuthor.email || '',
+        orcid: '',
+        is_corresponding: false,
+      })) : [])
+    ].filter((author) => author.name);
+
+    const articlePayload = {
+      id: `art-${Date.now()}`,
+      title: submission.paper_title || 'Untitled Paper',
+      issue_id: issues[0]?.id || '',
+      authors,
+      corresponding_author: submission.author_name || authors[0]?.name || 'Author',
+      corresponding_author_email: submission.author_email || authors[0]?.email || '',
+      abstract: submission.abstract || '',
+      keywords: Array.isArray(submission.keywords) 
+        ? submission.keywords 
+        : (submission.keywords || '').split(',').map(k => k.trim()).filter(k => k),
+      research_area: researchAreas[0]?.category || 'Commerce & Management',
+      article_type: 'Research Paper',
+      received_date: submission.submitted_date ? new Date(submission.submitted_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      revised_date: '',
+      accepted_date: new Date().toISOString().split('T')[0],
+      published_date: new Date().toISOString().split('T')[0],
+      doi: `10.5281/ijcast.${(submission.submission_id || '').replace(/[^a-zA-Z0-9]/g, '').slice(0, 20) || Date.now()}`,
+      page_numbers: '1-12',
+      pdf_url: submission.manuscript_file_url || '',
+      html_content: '',
+      article_references: '',
+      is_published: true,
+      created_at: new Date().toISOString(),
+      sort_order: articles.length + 1,
+    };
+
+    await saveArticle(articlePayload);
+    await updateSubmissionStatus(submission.id || submission.submission_id, 'PUBLISHED');
+    
+    // Send automatic publication notification email
+    try {
+      const emailResult = await sendPublicationNotificationEmail(submission, articlePayload);
+      console.log('📧 Automatic publication notification:', emailResult);
+    } catch (emailError) {
+      console.warn('⚠️ Publication notification failed (not blocking):', emailError);
+    }
+    
+    return { success: true, article: articlePayload };
+  };
+
+  // Send acceptance email with payment link
+  const sendAcceptanceEmail = async (submission) => {
+    try {
+      console.log('📧 Sending acceptance email for submission:', submission.submission_id);
+      
+      // Use the email service to send real emails
+      const result = await emailService.sendAcceptanceEmail(submission);
+      
+      if (result.success) {
+        console.log(`✅ Acceptance email sent via ${result.method}:`, {
+          to: submission.author_email,
+          cc: ['editor.ijcast.in@gmail.com', 'gyanakshar16092026@gmail.com'],
+          paymentUrl: result.paymentUrl
+        });
+        
+        return { 
+          success: true, 
+          emailSent: true, 
+          method: result.method,
+          paymentUrl: result.paymentUrl 
+        };
+      } else {
+        throw new Error('Email service returned failure');
+      }
+    } catch (error) {
+      console.error('Failed to send acceptance email:', error);
+      throw new Error('Failed to send acceptance email: ' + error.message);
+    }
+  };
+
+  // Send publication notification email to author
+  const sendPublicationNotificationEmail = async (submission, article) => {
+    try {
+      console.log('📧 Sending publication notification for:', submission.submission_id);
+      
+      // Use the email service to send publication notification
+      const result = await emailService.sendPublicationNotificationEmail(submission, article);
+      
+      if (result.success) {
+        console.log(`✅ Publication notification sent via ${result.method}:`, {
+          to: submission.author_email,
+          cc: ['editor.ijcast.in@gmail.com', 'gyanakshar16092026@gmail.com'],
+          article: article.id
+        });
+        
+        return { 
+          success: true, 
+          emailSent: true, 
+          method: result.method,
+          messageId: result.messageId 
+        };
+      } else {
+        throw new Error('Email service returned failure');
+      }
+    } catch (error) {
+      console.error('Failed to send publication notification:', error);
+      return { success: false, error: error.message };
+    }
+  };
+  const checkPaymentStatus = async (submissionId) => {
+    try {
+      console.log('Checking payment status for submission:', submissionId);
+      
+      // Call the API to check payment status
+      const response = await fetch(`/api/apc-payment/status/${submissionId}`);
+      const result = await response.json();
+      
+      if (result.success && result.paid) {
+        return {
+          paid: true,
+          amount: result.amount,
+          paymentId: result.paymentId,
+          paidAt: result.paidAt
+        };
+      } else {
+        return { 
+          paid: false, 
+          message: result.message || 'No payment found' 
+        };
+      }
+    } catch (error) {
+      console.error('Failed to check payment status:', error);
+      throw new Error('Failed to check payment status');
     }
   };
 
@@ -989,7 +1263,11 @@ export const JournalProvider = ({ children }) => {
     // Paper Submissions
     submitPaper,
     fetchSubmissions,
-    updateSubmissionStatus
+    updateSubmissionStatus,
+    convertSubmissionToPublishedArticle,
+    sendAcceptanceEmail,
+    sendPublicationNotificationEmail,
+    checkPaymentStatus
   };
 
   return (

@@ -10,13 +10,13 @@ export const TopHeader = () => {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
         {/* ISSN & Journal Metadata Specs */}
         <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
-          {settings.issn && (
+          {(settings.issn || settings.eissn) && (
             <span className="flex items-center space-x-1 text-slate-200 font-medium">
               <Award className="w-3.5 h-3.5 text-amber-500" />
-              <span>{settings.issn}</span>
+              <span>ISSN {settings.issn || settings.eissn}</span>
             </span>
           )}
-          {settings.eissn && (
+          {settings.eissn && settings.issn && (
             <span className="flex items-center space-x-1 text-slate-300">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
               <span>{settings.eissn}</span>

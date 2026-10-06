@@ -93,6 +93,18 @@ export const SubmitPaper = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validate required fields
+    if (!formData.author_name || !formData.author_email || !formData.author_phone ||
+        !formData.author_affiliation || !formData.author_institution || !formData.author_country) {
+      alert('Please fill out all required author information fields.');
+      return;
+    }
+    
+    if (!formData.paper_title || !formData.abstract || !formData.keywords) {
+      alert('Please fill out all required paper information fields (title, abstract, keywords).');
+      return;
+    }
+    
     if (!formData.consent_given) {
       alert('Please confirm that the submitted manuscript is original and complies with journal policies.');
       return;
@@ -106,19 +118,22 @@ export const SubmitPaper = () => {
     setLoading(true);
 
     try {
-      // Prepare submission data
+      // Prepare submission data with validation
       const submissionData = {
-        author_name: formData.author_name,
-        author_email: formData.author_email,
-        author_phone: formData.author_phone,
-        author_affiliation: formData.author_affiliation,
-        author_institution: formData.author_institution,
-        author_country: formData.author_country,
-        paper_title: formData.paper_title,
-        abstract: formData.abstract,
-        keywords: formData.keywords,
+        author_name: formData.author_name.trim(),
+        author_email: formData.author_email.trim(),
+        author_phone: formData.author_phone.trim(),
+        author_affiliation: formData.author_affiliation.trim(),
+        author_institution: formData.author_institution.trim(),
+        author_country: formData.author_country.trim(),
+        paper_title: formData.paper_title.trim(),
+        abstract: formData.abstract.trim(),
+        keywords: formData.keywords.trim(),
         coAuthors: formData.coAuthors,
       };
+
+      // Debug: Log submission data
+      console.log('📝 Submission Data:', submissionData);
 
       const files = {
         manuscript_file: formData.manuscript_file,
@@ -128,6 +143,8 @@ export const SubmitPaper = () => {
 
       // Submit to database
       const result = await submitPaper(submissionData, files);
+      
+      console.log('✅ Submission Result:', result);
       
       setSubmissionId(result.submissionId);
       setSubmitted(true);
@@ -184,8 +201,15 @@ export const SubmitPaper = () => {
               </div>
               
               <p className="text-sm text-slate-600 mb-6">
-                A confirmation email with your submission details has been sent to <strong>{formData.author_email}</strong>. 
-                Our editorial team will review your manuscript and contact you soon.
+                Your manuscript has been successfully submitted to our editorial team! Here's what happens next:
+                <br/><br/>
+                <strong>1. Editorial Review:</strong> Our team will conduct plagiarism checking and content review offline.
+                <br/>
+                <strong>2. Selection Decision:</strong> If your paper is selected for publication, we will send an acceptance email to <strong>{formData.author_email}</strong> with payment details and copyright transfer agreement.
+                <br/>
+                <strong>3. Publication:</strong> After payment confirmation, your paper will be published on the website with free access forever.
+                <br/><br/>
+                Please save your submission ID for future reference. Thank you for choosing IJCAST!
               </p>
               
               <button
@@ -206,10 +230,14 @@ export const SubmitPaper = () => {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-slate-900 mb-3">Submit Your Paper</h1>
-          <p className="text-lg text-slate-600">
-            Complete the form below to submit your manuscript to {settings.short_name}
+          <h1 className="text-4xl font-bold text-slate-900 mb-3">Submit Your Manuscript</h1>
+          <p className="text-lg text-slate-600 mb-2">
+            Submit your research paper to {settings.short_name} for editorial review
           </p>
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-900">
+            <p><strong>Review Process:</strong> All submissions undergo plagiarism checking and editorial review. 
+            Selected papers will receive acceptance notification with publication fee details and copyright agreement.</p>
+          </div>
         </div>
 
         {/* Form */}

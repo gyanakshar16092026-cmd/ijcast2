@@ -7,6 +7,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import paymentRoutes from './routes/payment.js';
 import webhookRoutes from './routes/webhook.js';
+import apcPaymentRoutes from './routes/apc-payment.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -58,6 +59,7 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/payments', paymentRoutes);
 app.use('/api/webhooks', webhookRoutes);
+app.use('/api/apc-payment', apcPaymentRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

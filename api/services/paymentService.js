@@ -99,11 +99,22 @@ export class PaymentService {
     }
 
     try {
-      const { data, error } = await supabase
+      // Try to get by order_id first
+      let { data, error } = await supabase
         .from('apc_payments')
         .select('*')
         .eq('order_id', orderId)
         .single();
+
+      // If not found by order_id, try by manuscript_id (for status checks)
+      if (error && error.code === 'PGRST116') {
+        ({ data, error } = await supabase
+          .from('apc_payments')
+          .select('*')
+          .eq('manuscript_id', orderId)
+          .eq('payment_status', 'SUCCESS')
+          .single());
+      }
 
       if (error) {
         if (error.code === 'PGRST116') {

@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS journal_settings (
   publisher TEXT DEFAULT 'IJCAST Publishing House',
   publication_frequency TEXT DEFAULT 'Bi-Monthly (6 Issues / Year)',
   language TEXT DEFAULT 'English',
-  contact_email TEXT DEFAULT 'editor@ijcast.in',
+  contact_email TEXT DEFAULT 'editor.ijcast.in@gmail.com',
   alternate_email TEXT DEFAULT 'editor.ijcast.in@gmail.com',
   phone TEXT DEFAULT '+91 98765 43210',
   postal_address TEXT DEFAULT 'IJCAST Editorial Office, Academic Research Complex, Suite 402, New Delhi, India',
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS submissions (
   copyright_filename TEXT,
   
   -- Status and Workflow
-  status TEXT DEFAULT 'SUBMITTED' CHECK (status IN ('SUBMITTED', 'UNDER REVIEW', 'REVISION REQUIRED', 'ACCEPTED', 'REJECTED', 'PUBLISHED')),
+  status TEXT DEFAULT 'SUBMITTED' CHECK (status IN ('SUBMITTED', 'UNDER REVIEW', 'REVISION REQUIRED', 'ACCEPTED', 'PAYMENT_PENDING', 'PAYMENT_RECEIVED', 'REJECTED', 'PUBLISHED')),
   
   -- Dates
   submitted_date TIMESTAMPTZ DEFAULT NOW(),
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS articles (
   published_date DATE DEFAULT CURRENT_DATE,
   doi TEXT, -- e.g. '10.5281/ijcast.2026.101'
   page_numbers TEXT, -- e.g. '1-14'
-  references TEXT,
+  article_references TEXT, -- Renamed from 'references' (reserved keyword)
   pdf_url TEXT, -- Supabase Storage URL
   html_content TEXT,
   sort_order INT DEFAULT 1,
@@ -230,8 +230,18 @@ ALTER TABLE research_areas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE page_content ENABLE ROW LEVEL SECURITY;
 ALTER TABLE media ENABLE ROW LEVEL SECURITY;
 
--- Allow ALL operations for everyone (anon + authenticated)
+-- Drop existing policies if they exist, then recreate
 -- This app uses a single admin with app-level auth, not Supabase Auth
+DROP POLICY IF EXISTS "Allow All Journal Settings" ON journal_settings;
+DROP POLICY IF EXISTS "Allow All Volumes" ON volumes;
+DROP POLICY IF EXISTS "Allow All Issues" ON issues;
+DROP POLICY IF EXISTS "Allow All Articles" ON articles;
+DROP POLICY IF EXISTS "Allow All Editorial Members" ON editorial_members;
+DROP POLICY IF EXISTS "Allow All Research Areas" ON research_areas;
+DROP POLICY IF EXISTS "Allow All Page Content" ON page_content;
+DROP POLICY IF EXISTS "Allow All Media" ON media;
+
+-- Create new policies
 CREATE POLICY "Allow All Journal Settings" ON journal_settings FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow All Volumes" ON volumes FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow All Issues" ON issues FOR ALL USING (true) WITH CHECK (true);
@@ -258,12 +268,25 @@ CREATE TABLE IF NOT EXISTS theses (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-ALTER TABLE theses ENABLE ROW LEVEL SECURITY;
+-- Drop and recreate policies for additional tables
+DROP POLICY IF EXISTS "Public Read Theses" ON theses;
+DROP POLICY IF EXISTS "Admin All Theses" ON theses;
+DROP POLICY IF EXISTS "Public Read Announcements" ON announcements;
+DROP POLICY IF EXISTS "Allow All Announcements" ON announcements;
+DROP POLICY IF EXISTS "Public Read Conferences" ON conferences;
+DROP POLICY IF EXISTS "Allow All Conferences" ON conferences;
+DROP POLICY IF EXISTS "Allow public insert submissions" ON submissions;
+DROP POLICY IF EXISTS "Allow users to view own submissions" ON submissions;
+DROP POLICY IF EXISTS "Allow All Submissions" ON submissions;
+DROP POLICY IF EXISTS "Allow insert submission_authors" ON submission_authors;
+DROP POLICY IF EXISTS "Allow All Submission Authors" ON submission_authors;
+DROP POLICY IF EXISTS "Allow public insert contact_messages" ON contact_messages;
+DROP POLICY IF EXISTS "Allow All Contact Messages" ON contact_messages;
+DROP POLICY IF EXISTS "Service role can manage all payments" ON apc_payments;
+DROP POLICY IF EXISTS "Allow All APC Payments" ON apc_payments;
 
--- Public can read published theses
+-- Recreate theses policies
 CREATE POLICY "Public Read Theses" ON theses FOR SELECT USING (is_published = true OR auth.role() = 'authenticated');
-
--- Authenticated users (admins) can do all operations
 CREATE POLICY "Admin All Theses" ON theses FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 
 -- 13. ANNOUNCEMENTS TABLE (Newsflash banner on home page)
@@ -277,12 +300,8 @@ CREATE TABLE IF NOT EXISTS announcements (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-ALTER TABLE announcements ENABLE ROW LEVEL SECURITY;
-
--- Anyone can read active announcements
+-- Recreate announcements policies
 CREATE POLICY "Public Read Announcements" ON announcements FOR SELECT USING (true);
-
--- Anon key can do all operations (app-level auth)
 CREATE POLICY "Allow All Announcements" ON announcements FOR ALL USING (true) WITH CHECK (true);
 
 -- 14. CONFERENCES TABLE
@@ -303,7 +322,7 @@ CREATE TABLE IF NOT EXISTS conferences (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-ALTER TABLE conferences ENABLE ROW LEVEL SECURITY;
+-- Recreate conferences policies
 CREATE POLICY "Public Read Conferences" ON conferences FOR SELECT USING (true);
 CREATE POLICY "Allow All Conferences" ON conferences FOR ALL USING (true) WITH CHECK (true);
 
@@ -356,11 +375,8 @@ CREATE OR REPLACE TRIGGER update_apc_payments_updated_at
 -- Add RLS policies (Row Level Security)
 ALTER TABLE apc_payments ENABLE ROW LEVEL SECURITY;
 
--- Policy for service role (full access for backend)
-CREATE POLICY "Service role can manage all payments" ON apc_payments
-  FOR ALL USING (auth.role() = 'service_role');
-
--- Policy for anon key (app-level auth)
+-- Recreate APC payments policies  
+CREATE POLICY "Service role can manage all payments" ON apc_payments FOR ALL USING (auth.role() = 'service_role');
 CREATE POLICY "Allow All APC Payments" ON apc_payments FOR ALL USING (true) WITH CHECK (true);
 
 -- Add comments for documentation
@@ -476,43 +492,23 @@ CREATE INDEX IF NOT EXISTS idx_editorial_members_is_active ON editorial_members(
 -- Enable RLS on submissions table
 ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;
 
--- Allow public insert (for submission form)
-CREATE POLICY "Allow public insert submissions" ON submissions
-  FOR INSERT
-  TO anon
-  WITH CHECK (true);
-
--- Allow public select for their own submissions (if you add user auth)
-CREATE POLICY "Allow users to view own submissions" ON submissions
-  FOR SELECT
-  TO authenticated
-  USING (author_email = auth.jwt()->>'email');
-
--- Allow admin full access
+-- Recreate submissions policies
+CREATE POLICY "Allow public insert submissions" ON submissions FOR INSERT TO anon WITH CHECK (true);
+CREATE POLICY "Allow users to view own submissions" ON submissions FOR SELECT TO authenticated USING (author_email = auth.jwt()->>'email');
 CREATE POLICY "Allow All Submissions" ON submissions FOR ALL USING (true) WITH CHECK (true);
 
 -- Enable RLS on submission_authors
 ALTER TABLE submission_authors ENABLE ROW LEVEL SECURITY;
 
--- Allow insert when inserting submission
-CREATE POLICY "Allow insert submission_authors" ON submission_authors
-  FOR INSERT
-  TO anon
-  WITH CHECK (true);
-
--- Allow admin full access
+-- Recreate submission_authors policies
+CREATE POLICY "Allow insert submission_authors" ON submission_authors FOR INSERT TO anon WITH CHECK (true);
 CREATE POLICY "Allow All Submission Authors" ON submission_authors FOR ALL USING (true) WITH CHECK (true);
 
 -- Enable RLS on contact_messages
 ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
 
--- Allow public insert
-CREATE POLICY "Allow public insert contact_messages" ON contact_messages
-  FOR INSERT
-  TO anon
-  WITH CHECK (true);
-
--- Allow admin full access
+-- Recreate contact_messages policies
+CREATE POLICY "Allow public insert contact_messages" ON contact_messages FOR INSERT TO anon WITH CHECK (true);
 CREATE POLICY "Allow All Contact Messages" ON contact_messages FOR ALL USING (true) WITH CHECK (true);
 
 -- ========================================================
