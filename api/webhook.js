@@ -1,6 +1,15 @@
-import { createHash, createHmac } from 'crypto';
-import { supabase } from '../config/supabase-vercel.js';
-import { cashfreeConfig } from '../config/cashfree-vercel.js';
+import { createHmac } from 'crypto';
+import { createClient } from '@supabase/supabase-js';
+
+// Supabase configuration
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+// Cashfree configuration
+const cashfreeConfig = {
+  clientSecret: process.env.VITE_CASHFREE_CLIENT_SECRET || process.env.CASHFREE_CLIENT_SECRET
+};
 
 const verifyWebhookSignature = (body, signature, timestamp) => {
   if (!signature || !timestamp) {
