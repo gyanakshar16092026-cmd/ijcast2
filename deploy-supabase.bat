@@ -7,7 +7,8 @@ echo Setting up Supabase secrets...
 echo.
 
 echo Setting Cashfree App ID...
-supabase secrets set CASHFREE_APP_ID=1441120d9e27c52380edb7f14b70211441
+echo Please run this command manually with your actual App ID:
+echo supabase secrets set CASHFREE_APP_ID=YOUR_ACTUAL_APP_ID
 
 echo.
 echo IMPORTANT: Replace the placeholder below with your actual production secret key
@@ -48,6 +49,6 @@ echo 2. Test the payment flow on /apc page
 echo.
 echo 3. Monitor Edge Function logs in Supabase dashboard
 echo.
-echo 4. Remember to set the actual CASHFREE_SECRET_KEY manually
+echo 4. Remember to set both CASHFREE_APP_ID and CASHFREE_SECRET_KEY manually
 echo ============================================================
 pause

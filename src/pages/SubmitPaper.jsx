@@ -55,9 +55,38 @@ export const SubmitPaper = () => {
   const handleFileChange = (e) => {
     const { name, files } = e.target;
     if (files && files[0]) {
+      const file = files[0];
+      
+      // PHASE 16: Frontend file validation
+      const validations = {
+        manuscript_file: { types: ['pdf', 'doc', 'docx'], maxSize: 10 },
+        cover_letter_file: { types: ['pdf', 'doc', 'docx'], maxSize: 5 },
+        copyright_file: { types: ['pdf'], maxSize: 2 }
+      };
+      
+      const config = validations[name];
+      if (config) {
+        // Check file size
+        const maxSizeBytes = config.maxSize * 1024 * 1024;
+        if (file.size > maxSizeBytes) {
+          alert(`File size exceeds ${config.maxSize}MB limit`);
+          e.target.value = '';
+          return;
+        }
+        
+        // Check file extension
+        const fileName = file.name.toLowerCase();
+        const hasValidExtension = config.types.some(type => fileName.endsWith(`.${type}`));
+        if (!hasValidExtension) {
+          alert(`Invalid file type. Allowed: ${config.types.map(t => `.${t}`).join(', ')}`);
+          e.target.value = '';
+          return;
+        }
+      }
+      
       setFormData(prev => ({
         ...prev,
-        [name]: files[0]
+        [name]: file
       }));
     }
   };

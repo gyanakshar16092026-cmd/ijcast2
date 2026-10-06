@@ -6,11 +6,21 @@ import { BookOpen, Layers, Calendar, Sparkles } from 'lucide-react';
 export const CurrentIssue = () => {
   const { volumes, issues, articles } = useJournal();
 
-  // Find latest active issue
+  // PHASE 11: Improved current issue detection logic
+  // Find latest active volume
   const activeVolume = volumes.find(v => v.status === 'Active') || volumes[0];
+  
+  // Find the most recently published issue in the active volume
   const activeIssue = issues
     .filter(i => activeVolume && i.volume_id === activeVolume.id)
-    .sort((a, b) => b.issue_number - a.issue_number)[0] || issues[0];
+    .sort((a, b) => {
+      // Primary sort by publication date if available
+      if (a.pub_date && b.pub_date) {
+        return new Date(b.pub_date) - new Date(a.pub_date);
+      }
+      // Secondary sort by issue number (highest first)
+      return b.issue_number - a.issue_number;
+    })[0] || issues[0];
 
   const currentArticles = activeIssue
     ? articles.filter(a => a.issue_id === activeIssue.id && a.is_published)

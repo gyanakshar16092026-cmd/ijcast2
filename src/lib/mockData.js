@@ -22,6 +22,7 @@ export const initialJournalSettings = {
   license_url: 'https://creativecommons.org/licenses/by/4.0/',
   is_open_access: true,
   open_access_statement: 'IJCAST is a peer-reviewed open access journal. All published articles are instantly available online for global readership without subscription walls.',
+  impact_factor: null, // PHASE 5: Impact factor should come from database, not hardcoded
   updated_at: new Date().toISOString()
 };
 

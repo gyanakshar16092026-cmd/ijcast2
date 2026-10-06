@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useJournal } from '../../context/JournalContext';
 import { Link } from 'react-router-dom';
 import { Search, X, BookOpen, User, Tag, Layers, Filter } from 'lucide-react';
@@ -7,6 +7,22 @@ export const SearchModal = () => {
   const { articles, volumes, issues, isSearchOpen, setIsSearchOpen } = useJournal();
   const [query, setQuery] = useState('');
   const [selectedDomain, setSelectedDomain] = useState('All');
+
+  // PHASE 8: Add keyboard shortcut (Cmd/Ctrl + K) for search
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+      if (e.key === 'Escape' && isSearchOpen) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isSearchOpen, setIsSearchOpen]);
 
   const filteredArticles = useMemo(() => {
     if (!query.trim() && selectedDomain === 'All') return [];
@@ -46,7 +62,7 @@ export const SearchModal = () => {
           <Search className="w-5 h-5 text-slate-400 flex-shrink-0" />
           <input
             type="text"
-            placeholder="Search articles by title, author, keywords, volume, issue, or domain..."
+            placeholder="Search articles by title, author, keywords, volume, issue, or domain... (Ctrl+K)"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full bg-transparent text-sm text-slate-900 focus:outline-none placeholder-slate-400 font-sans"

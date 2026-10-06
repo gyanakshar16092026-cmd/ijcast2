@@ -11,7 +11,8 @@ export const ArticleDetail = () => {
 
   const article = articles.find(a => a.id === id);
 
-  if (!article) {
+  // PHASE 9: CRITICAL FIX - Prevent public access to unpublished articles
+  if (!article || !article.is_published) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-20 text-center space-y-4">
         <h2 className="text-2xl font-bold font-serif text-slate-900">Article Not Found</h2>
@@ -27,14 +28,17 @@ export const ArticleDetail = () => {
   const volObj = issueObj ? volumes.find(v => v.id === issueObj.volume_id) : null;
 
   const mainAuthor = article.authors?.[0]?.name || 'IJCAST Author';
-  const yearStr = issueObj ? issueObj.year : '2026';
+  // PHASE 11: Use current year as fallback instead of hardcoded 2026
+  const yearStr = issueObj ? issueObj.year : new Date().getFullYear();
   const volStr = volObj ? `Vol. ${volObj.volume_number}` : '';
   const issStr = issueObj ? `No. ${issueObj.issue_number}` : '';
   const pagesStr = article.page_numbers || '1-10';
 
-  const apaCitation = `${mainAuthor} et al. (${yearStr}). ${article.title}. ${settings.journal_name}, ${volStr}(${issStr}), ${pagesStr}. https://doi.org/${article.doi || '10.5281/ijcast'}`;
-  const mlaCitation = `${mainAuthor}, et al. "${article.title}." ${settings.journal_name}, vol. ${volObj?.volume_number || 1}, no. ${issueObj?.issue_number || 1}, ${yearStr}, pp. ${pagesStr}.`;
-  const bibtexCitation = `@article{ijcast_${article.id},\n  title={${article.title}},\n  author={${article.authors?.map(a => a.name).join(' and ')}},\n  journal={${settings.journal_name}},\n  volume={${volObj?.volume_number || 1}},\n  number={${issueObj?.issue_number || 1}},\n  pages={${pagesStr}},\n  year={${yearStr}},\n  doi={${article.doi || ''}}\n}`;
+  // PHASE 10: Fixed citation formatting - only include DOI when actually present
+  // PHASE 11: Use actual volume/issue numbers from database, fallback to current year
+  const apaCitation = `${mainAuthor} et al. (${yearStr}). ${article.title}. ${settings.journal_name}, ${volStr}(${issStr}), ${pagesStr}.${article.doi ? ` https://doi.org/${article.doi}` : ''}`;
+  const mlaCitation = `${mainAuthor}, et al. "${article.title}." ${settings.journal_name}, vol. ${volObj?.volume_number || 'N/A'}, no. ${issueObj?.issue_number || 'N/A'}, ${yearStr}, pp. ${pagesStr}.`;
+  const bibtexCitation = `@article{ijcast_${article.id},\n  title={${article.title}},\n  author={${article.authors?.map(a => a.name).join(' and ')}},\n  journal={${settings.journal_name}},\n  volume={${volObj?.volume_number || 'N/A'}},\n  number={${issueObj?.issue_number || 'N/A'}},\n  pages={${pagesStr}},\n  year={${yearStr}}${article.doi ? `,\n  doi={${article.doi}}` : ''}\n}`;
 
   const currentCitation = citationFormat === 'APA' ? apaCitation : citationFormat === 'MLA' ? mlaCitation : bibtexCitation;
 
