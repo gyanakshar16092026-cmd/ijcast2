@@ -115,6 +115,25 @@ export const EditorialManager = () => {
 
         <div className="flex items-center space-x-2">
           <button
+            onClick={() => {
+              console.log('🔍 EDITORIAL MEMBERS DEBUG:', editorialMembers);
+              editorialMembers.forEach((mem, idx) => {
+                console.log(`${idx + 1}. ${mem.name}:`);
+                console.log(`   - ID: ${mem.id}`);
+                console.log(`   - Photo URL: ${mem.photo_url || '(no photo)'}`);
+                console.log(`   - Active: ${mem.is_active}`);
+                console.log(`   - Role: ${mem.role}`);
+              });
+              alert(`📊 Editorial Members Debug Info\n\nTotal members: ${editorialMembers.length}\nActive members: ${editorialMembers.filter(m => m.is_active).length}\n\nCheck browser console for detailed photo URL info`);
+            }}
+            className="flex items-center space-x-1.5 px-3 py-2 bg-blue-800 hover:bg-blue-700 text-blue-200 font-semibold text-xs rounded-xl shadow transition-colors border border-blue-700"
+            title="Debug editorial member data and photo URLs"
+          >
+            <Users className="w-4 h-4" />
+            <span>Debug Data</span>
+          </button>
+          
+          <button
             onClick={testStorageBuckets}
             className="flex items-center space-x-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl shadow transition-colors border border-slate-700"
             title="Test if storage buckets exist for image uploads"

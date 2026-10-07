@@ -13,7 +13,10 @@ const MemberCard = ({ mem, size = 'md', showNumber = null, roleLabel = null, rol
         src={mem.photo_url || '/gyan-akshar-logo.png'}
         alt={mem.name}
         className={`${imgSize} object-cover border-2 border-amber-400 flex-shrink-0`}
-        onError={e => { e.target.src = '/gyan-akshar-logo.png'; }}
+        onError={e => { 
+          console.log(`❌ Image load failed for ${mem.name}: ${mem.photo_url}`);
+          e.target.src = '/gyan-akshar-logo.png'; 
+        }}
       />
       <div className="flex-1 min-w-0">
         {roleLabel && (
@@ -41,6 +44,20 @@ const SectionHeader = ({ title }) => (
 export const EditorialBoard = () => {
   const { editorialMembers } = useJournal();
   const active = editorialMembers.filter(m => m.is_active).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+
+  // Debug logging to help troubleshoot photo display issues
+  React.useEffect(() => {
+    console.log('🌐 PUBLIC EDITORIAL BOARD - Data loaded:', {
+      totalMembers: editorialMembers.length,
+      activeMembers: active.length,
+      membersWithPhotos: editorialMembers.filter(m => m.photo_url && m.photo_url !== '/gyan-akshar-logo.png').length
+    });
+    editorialMembers.forEach((mem, idx) => {
+      if (mem.photo_url && mem.photo_url !== '/gyan-akshar-logo.png') {
+        console.log(`📸 Photo ${idx + 1}: ${mem.name} -> ${mem.photo_url}`);
+      }
+    });
+  }, [editorialMembers, active]);
 
   const editorInChief    = active.filter(m => m.role === 'Editor-in-Chief');
   const managingEditor   = active.filter(m => m.role === 'Managing Editor');
@@ -73,7 +90,10 @@ export const EditorialBoard = () => {
                   src={mem.photo_url || '/gyan-akshar-logo.png'}
                   alt={mem.name}
                   className="w-32 h-32 rounded-2xl object-cover border-4 border-amber-500 shadow-md flex-shrink-0"
-                  onError={e => { e.target.src = '/gyan-akshar-logo.png'; }}
+                  onError={e => { 
+                    console.log(`❌ Image load failed for ${mem.name} (Editor-in-Chief): ${mem.photo_url}`);
+                    e.target.src = '/gyan-akshar-logo.png'; 
+                  }}
                 />
                 <div className="space-y-2">
                   <span className="px-2.5 py-0.5 bg-amber-100 text-amber-800 font-bold rounded text-xs">Editor-in-Chief</span>
@@ -103,7 +123,10 @@ export const EditorialBoard = () => {
                   src={mem.photo_url || '/gyan-akshar-logo.png'}
                   alt={mem.name}
                   className="w-28 h-28 rounded-2xl object-cover border-4 border-sky-400 shadow-md flex-shrink-0"
-                  onError={e => { e.target.src = '/gyan-akshar-logo.png'; }}
+                  onError={e => { 
+                    console.log(`❌ Image load failed for ${mem.name} (Managing Editor): ${mem.photo_url}`);
+                    e.target.src = '/gyan-akshar-logo.png'; 
+                  }}
                 />
                 <div className="space-y-2">
                   <span className="px-2.5 py-0.5 bg-sky-100 text-sky-800 font-bold rounded text-xs">Managing Editor</span>
