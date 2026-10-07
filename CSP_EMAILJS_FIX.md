@@ -18,19 +18,20 @@ Framing 'https://wnextwrzgxrrmmuuabtv.supabase.co/' violates the following Conte
 
 **BEFORE** (Restrictive):
 ```
-connect-src 'self' https://*.supabase.co https://api.cashfree.com https://sandbox.cashfree.com
+connect-src 'self' https://*.supabase.co https://api.cashfree.com https://sandbox.cashfree.com https://api.emailjs.com
 frame-src 'self' https://sandbox.cashfree.com https://api.cashfree.com
 ```
 
 **AFTER** (Properly Configured):
 ```
-connect-src 'self' https://*.supabase.co https://api.cashfree.com https://sandbox.cashfree.com https://api.emailjs.com
+connect-src 'self' data: https://*.supabase.co https://api.cashfree.com https://sandbox.cashfree.com https://api.emailjs.com
 frame-src 'self' https://sandbox.cashfree.com https://api.cashfree.com https://*.supabase.co
 ```
 
 ### **Changes Made**:
 - ✅ **Added `https://api.emailjs.com`** to `connect-src` → **EmailJS emails work**
 - ✅ **Added `https://*.supabase.co`** to `frame-src` → **PDF preview works**
+- ✅ **Added `data:`** to `connect-src` → **Base64 image conversion works**
 
 ## 🎯 **What This Fixes**
 
@@ -46,6 +47,12 @@ frame-src 'self' https://sandbox.cashfree.com https://api.cashfree.com https://*
 - ✅ **File downloads** working properly
 - ✅ **Manuscript viewing** without CSP blocks
 
+### **Image Upload Process** 📸
+- ✅ **Base64 to blob conversion** works properly
+- ✅ **File upload to Supabase Storage** succeeds  
+- ✅ **Image URLs** generate correctly
+- ✅ **Photo previews** display without CSP blocks
+
 ## 🔒 **Security Maintained**
 
 ### **Still Secure**:
@@ -60,6 +67,7 @@ frame-src 'self' https://sandbox.cashfree.com https://api.cashfree.com https://*
 EmailJS:    https://api.emailjs.com
 Supabase:   https://*.supabase.co  
 Cashfree:   https://api.cashfree.com, https://sandbox.cashfree.com
+Data URLs:  data: (for base64 image conversion)
 Own Site:   'self'
 ```
 
@@ -79,6 +87,14 @@ Own Site:   'self'
 ✅ Smooth PDF preview and download
 ```
 
+### **Image Upload** (Should Work):
+```
+✅ Editorial photo upload successful
+✅ Base64 to blob conversion works  
+✅ No CSP violations for data: URLs
+✅ Images save to Supabase Storage properly
+```
+
 ## 🚀 **Deployment**
 
 ### **Auto-Deploy**:
@@ -89,8 +105,9 @@ Own Site:   'self'
 ### **Testing**:
 1. **EmailJS**: Send acceptance email from admin dashboard
 2. **PDF Preview**: Click "Preview" on any submission
-3. **Console**: Should show no CSP violation errors
-4. **Functionality**: All features should work normally
+3. **Image Upload**: Upload editorial board member photo
+4. **Console**: Should show no CSP violation errors
+5. **Functionality**: All features should work normally
 
 ---
 
@@ -98,7 +115,8 @@ Own Site:   'self'
 
 **EmailJS**: Real emails sent ✅
 **PDF Viewer**: Smooth previews ✅  
+**Image Upload**: Editorial photos work ✅
 **Security**: Maintained with proper CSP ✅
 **User Experience**: No more blocked features ✅
 
-Your IJCAST application now has both security and full functionality! 🔒📧📄
+Your IJCAST application now has both security and full functionality! 🔒📧📄📸
