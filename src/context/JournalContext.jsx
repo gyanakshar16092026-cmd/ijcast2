@@ -510,30 +510,47 @@ export const JournalProvider = ({ children }) => {
       let finalPhotoUrl = memberData.photo_url || '';
       if (memberData.photo_url?.startsWith('data:')) {
         try {
+          console.log('📤 Uploading base64 photo to Supabase Storage...');
+          
           // Convert base64 to blob
           const res = await fetch(memberData.photo_url);
           const blob = await res.blob();
           const ext = blob.type.includes('png') ? 'png' : 'jpg';
           const fileName = `editorial/${Date.now()}.${ext}`;
+          
+          console.log(`📁 Uploading file: ${fileName} (${blob.size} bytes, ${blob.type})`);
+          
           const { data: uploaded, error: uploadErr } = await supabase.storage
             .from('journal-images')
             .upload(fileName, blob, { contentType: blob.type, upsert: true });
-          if (!uploadErr && uploaded) {
-            const { data: { publicUrl } } = supabase.storage.from('journal-images').getPublicUrl(fileName);
-            finalPhotoUrl = publicUrl;
+            
+          if (uploadErr) {
+            console.error('❌ Upload error:', uploadErr);
+            throw new Error(`Upload failed: ${uploadErr.message}`);
           }
+          
+          if (uploaded) {
+            const { data: { publicUrl } } = supabase.storage.from('journal-images').getPublicUrl(fileName);
+            console.log('✅ Photo uploaded successfully:', publicUrl);
+            finalPhotoUrl = publicUrl;
+          } else {
+            throw new Error('Upload succeeded but no data returned');
+          }
+          
         } catch (uploadEx) {
           console.error('❌ Editorial photo upload failed:', uploadEx);
           
           // Check if it's a bucket not found error
-          if (uploadEx.message && uploadEx.message.includes('bucket')) {
+          if (uploadEx.message && (uploadEx.message.includes('bucket') || uploadEx.message.includes('not found'))) {
             console.error('🚨 BUCKET ERROR: journal-images bucket not found in Supabase Storage');
             alert('⚠️ STORAGE SETUP REQUIRED\n\nThe "journal-images" bucket is missing from your Supabase Storage.\n\n📋 TO FIX:\n1. Go to Supabase Dashboard → Storage\n2. Create new bucket: "journal-images"\n3. Set as Public: ✅ Yes\n4. Max file size: 5MB\n5. Try uploading again');
           } else {
-            alert('⚠️ Photo upload failed: ' + (uploadEx.message || 'Unknown error') + '\n\nSaving member without photo. You can edit later to add photo.');
+            alert('⚠️ Photo upload failed: ' + (uploadEx.message || 'Unknown error') + '\n\nSaving member with base64 photo for now. Create the journal-images bucket to store photos properly.');
           }
           
-          finalPhotoUrl = '';
+          // Keep the base64 as fallback if upload fails
+          console.log('📝 Keeping base64 photo as fallback due to upload failure');
+          finalPhotoUrl = memberData.photo_url;
         }
       }
 

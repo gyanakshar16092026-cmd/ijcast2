@@ -66,7 +66,7 @@ export const Home = () => {
             {/* Main Content */}
             <div className="space-y-6">
               {/* Status Badges */}
-              <div className="flex items-center justify-center space-x-2 text-xs">
+              <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
                 <span className="inline-flex items-center space-x-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <span>PEER REVIEWED</span>
@@ -78,6 +78,11 @@ export const Home = () => {
                 <span className="text-gray-400">•</span>
                 <span className="inline-flex items-center space-x-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full font-medium">
                   <span>MULTI-DISCIPLINARY JOURNAL</span>
+                </span>
+                <span className="text-gray-400">•</span>
+                <span className="inline-flex items-center space-x-1 px-3 py-1 bg-red-100 text-red-700 rounded-full font-bold">
+                  <Award className="w-3 h-3" />
+                  <span>IMPACT FACTOR: 6.255</span>
                 </span>
               </div>
 
@@ -159,6 +164,55 @@ export const Home = () => {
               </div>
               <div className="text-2xl font-bold text-gray-900 mb-1">Global</div>
               <div className="text-sm text-gray-500 font-medium">Researchers</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Indexing Information Section */}
+      <div className="bg-slate-50 border-y border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Indexed In</h2>
+            <p className="text-gray-600">IJCAST is indexed in prestigious academic databases and platforms</p>
+          </div>
+          
+          {/* Indexing Logos Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-8 items-center justify-items-center">
+            {/* Google Scholar */}
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 w-28 h-20 flex items-center justify-center hover:shadow-md transition-shadow">
+              <img 
+                src="/googlelogo.jpeg" 
+                alt="Google Scholar" 
+                className="max-w-full max-h-full object-contain"
+              />
+            </div>
+            
+            {/* Scholar (Google Scholar variant) */}
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 w-28 h-20 flex items-center justify-center hover:shadow-md transition-shadow">
+              <img 
+                src="/scholarlogo.jpeg" 
+                alt="Google Scholar" 
+                className="max-w-full max-h-full object-contain"
+              />
+            </div>
+            
+            {/* Academic */}
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 w-28 h-20 flex items-center justify-center hover:shadow-md transition-shadow">
+              <img 
+                src="/academiclogo.jpeg" 
+                alt="Academic Database" 
+                className="max-w-full max-h-full object-contain"
+              />
+            </div>
+            
+            {/* Together */}
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 w-28 h-20 flex items-center justify-center hover:shadow-md transition-shadow">
+              <img 
+                src="/togetherlogo.jpeg" 
+                alt="Together Database" 
+                className="max-w-full max-h-full object-contain"
+              />
             </div>
           </div>
         </div>
