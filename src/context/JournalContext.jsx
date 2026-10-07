@@ -467,6 +467,40 @@ export const JournalProvider = ({ children }) => {
     }
   };
 
+  // Test Storage Buckets Access
+  const testStorageBuckets = async () => {
+    if (!isSupabaseConfigured || !supabase) {
+      alert('⚠️ Supabase not configured');
+      return;
+    }
+
+    console.log('🧪 Testing Supabase Storage buckets...');
+    
+    const requiredBuckets = ['manuscripts', 'journal-images', 'published-papers'];
+    const results = [];
+
+    for (const bucketName of requiredBuckets) {
+      try {
+        // Try to list files in bucket to test access
+        const { data, error } = await supabase.storage.from(bucketName).list('', { limit: 1 });
+        
+        if (error) {
+          results.push(`❌ ${bucketName}: ${error.message}`);
+          console.error(`❌ Bucket "${bucketName}" error:`, error);
+        } else {
+          results.push(`✅ ${bucketName}: OK (${data.length} files listed)`);
+          console.log(`✅ Bucket "${bucketName}" accessible`);
+        }
+      } catch (ex) {
+        results.push(`❌ ${bucketName}: ${ex.message || 'Unknown error'}`);
+        console.error(`❌ Bucket "${bucketName}" exception:`, ex);
+      }
+    }
+
+    alert('🧪 STORAGE BUCKETS TEST RESULTS:\n\n' + results.join('\n') + '\n\n📋 If any buckets show errors, create them in:\nSupabase Dashboard → Storage → New Bucket');
+    return results;
+  };
+
   // Editorial Members
   const saveEditorialMember = async (memberData) => {
     if (isSupabaseConfigured && supabase) {
@@ -489,7 +523,16 @@ export const JournalProvider = ({ children }) => {
             finalPhotoUrl = publicUrl;
           }
         } catch (uploadEx) {
-          console.warn('Photo upload failed, saving without photo:', uploadEx);
+          console.error('❌ Editorial photo upload failed:', uploadEx);
+          
+          // Check if it's a bucket not found error
+          if (uploadEx.message && uploadEx.message.includes('bucket')) {
+            console.error('🚨 BUCKET ERROR: journal-images bucket not found in Supabase Storage');
+            alert('⚠️ STORAGE SETUP REQUIRED\n\nThe "journal-images" bucket is missing from your Supabase Storage.\n\n📋 TO FIX:\n1. Go to Supabase Dashboard → Storage\n2. Create new bucket: "journal-images"\n3. Set as Public: ✅ Yes\n4. Max file size: 5MB\n5. Try uploading again');
+          } else {
+            alert('⚠️ Photo upload failed: ' + (uploadEx.message || 'Unknown error') + '\n\nSaving member without photo. You can edit later to add photo.');
+          }
+          
           finalPhotoUrl = '';
         }
       }
@@ -1267,7 +1310,8 @@ export const JournalProvider = ({ children }) => {
     convertSubmissionToPublishedArticle,
     sendAcceptanceEmail,
     sendPublicationNotificationEmail,
-    checkPaymentStatus
+    checkPaymentStatus,
+    testStorageBuckets
   };
 
   return (

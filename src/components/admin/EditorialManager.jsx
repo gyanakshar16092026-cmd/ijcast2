@@ -3,7 +3,7 @@ import { useJournal } from '../../context/JournalContext';
 import { Plus, Edit, Trash2, CheckCircle2, XCircle, Users, ArrowUp, ArrowDown, Upload, Image as ImageIcon, Link as LinkIcon, X } from 'lucide-react';
 
 export const EditorialManager = () => {
-  const { editorialMembers, saveEditorialMember, deleteEditorialMember, toggleEditorialActive, reorderEditorialMembers } = useJournal();
+  const { editorialMembers, saveEditorialMember, deleteEditorialMember, toggleEditorialActive, reorderEditorialMembers, testStorageBuckets } = useJournal();
   const [editingMember, setEditingMember] = useState(null);
 
   const moveUp = (index) => {
@@ -113,13 +113,24 @@ export const EditorialManager = () => {
           <p className="text-xs text-slate-400">Add, Edit, Delete, Activate/Deactivate, and Reorder editorial board members.</p>
         </div>
 
-        <button
-          onClick={handleOpenNew}
-          className="flex items-center space-x-1.5 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-xl shadow transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          <span>+ Add Editor</span>
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={testStorageBuckets}
+            className="flex items-center space-x-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl shadow transition-colors border border-slate-700"
+            title="Test if storage buckets exist for image uploads"
+          >
+            <Upload className="w-4 h-4" />
+            <span>Test Storage</span>
+          </button>
+          
+          <button
+            onClick={handleOpenNew}
+            className="flex items-center space-x-1.5 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-xl shadow transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>+ Add Editor</span>
+          </button>
+        </div>
       </div>
 
       {/* Form Modal */}
