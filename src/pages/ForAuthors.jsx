@@ -97,11 +97,11 @@ export const ForAuthors = () => {
               <div>
                 <h4 className="text-sm font-bold text-slate-900">IJCAST Manuscript Template</h4>
                 <p className="text-xs text-slate-600 mt-0.5">Official Word template for formatting your paper before submission.</p>
-                <p className="text-[11px] text-amber-700 font-medium mt-1">IJCAST-Paper-Template.docx</p>
+                <p className="text-[11px] text-amber-700 font-medium mt-1">IJRT Paper Template.docx</p>
               </div>
               <a
-                href="/IJCAST-Paper-Template.docx"
-                download="IJCAST Paper Template.docx"
+                href="/IJRT Paper Template.docx"
+                download="IJRT Paper Template.docx"
                 className="inline-flex items-center space-x-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow transition-colors"
               >
                 <Download className="w-3.5 h-3.5" />
@@ -119,11 +119,11 @@ export const ForAuthors = () => {
               <div>
                 <h4 className="text-sm font-bold text-slate-900">Copyright Transfer Agreement</h4>
                 <p className="text-xs text-slate-600 mt-0.5">Fill, sign and submit this form along with your manuscript.</p>
-                <p className="text-[11px] text-slate-500 font-medium mt-1">IJCAST-Copyright-Transfer-Agreement.pdf</p>
+                <p className="text-[11px] text-slate-500 font-medium mt-1">Copyright transfer agreement-IJRT.pdf</p>
               </div>
               <a
-                href="/IJCAST-Copyright-Transfer-Agreement.pdf"
-                download="Copyright Transfer Agreement IJCAST.pdf"
+                href="/Copyright transfer agreement-IJRT.pdf"
+                download="Copyright transfer agreement-IJRT.pdf"
                 className="inline-flex items-center space-x-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl shadow transition-colors"
               >
                 <Download className="w-3.5 h-3.5" />
