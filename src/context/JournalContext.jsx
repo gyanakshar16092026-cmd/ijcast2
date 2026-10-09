@@ -132,7 +132,7 @@ export const JournalProvider = ({ children }) => {
             short_name: set.short_name || 'IJRT',
             issn: (!set.issn || set.issn === 'ISSN XXXX-XXXX' || set.issn.includes('2349')) ? '2394-9007' : set.issn,
             eissn: (!set.eissn || set.eissn.includes('2349') || set.eissn === 'e-ISSN XXXX-XXXX') ? '2394-9007' : set.eissn,
-            contact_email: (!set.contact_email || set.contact_email === 'editor@IJRT.org' || set.contact_email === 'editor.IJRT@gmail.com' || set.contact_email === 'editor@IJRT.in') ? 'editor.IJRT.in@gmail.com' : set.contact_email,
+            contact_email: (!set.contact_email || set.contact_email === 'editor@IJRT.org' || set.contact_email === 'editor.IJRT@gmail.com' || set.contact_email === 'editor@IJRT.in') ? 'editor.ijrtonline@gmail.com' : set.contact_email,
             alternate_email: '',
             publisher: (set.publisher === 'IJRT Academic Research Publications Group' || !set.publisher)
               ? 'Gyan Akshar Sanskriti Foundation'
@@ -146,7 +146,7 @@ export const JournalProvider = ({ children }) => {
             supabase.from('journal_settings').update({
               issn: corrected.issn, eissn: corrected.eissn, publisher: corrected.publisher,
               publication_frequency: corrected.publication_frequency,
-              contact_email: 'editor.IJRT.in@gmail.com', alternate_email: '',
+              contact_email: 'editor.ijrtonline@gmail.com', alternate_email: '',
             }).eq('id', set.id);
           }
         }
@@ -1082,7 +1082,7 @@ export const JournalProvider = ({ children }) => {
       if (result.success) {
         console.log(`✅ Acceptance email sent via ${result.method}:`, {
           to: submission.author_email,
-          cc: ['editor.IJRT.in@gmail.com', 'gyanakshar16092026@gmail.com'],
+          cc: ['editor.ijrtonline@gmail.com', 'gyanakshar16092026@gmail.com'],
           paymentUrl: result.paymentUrl
         });
         
@@ -1112,7 +1112,7 @@ export const JournalProvider = ({ children }) => {
       if (result.success) {
         console.log(`✅ Publication notification sent via ${result.method}:`, {
           to: submission.author_email,
-          cc: ['editor.IJRT.in@gmail.com', 'gyanakshar16092026@gmail.com'],
+          cc: ['editor.ijrtonline@gmail.com', 'gyanakshar16092026@gmail.com'],
           article: article.id
         });
         
@@ -1345,5 +1345,6 @@ export const useJournal = () => {
   }
   return context;
 };
+
 
 

@@ -13,7 +13,7 @@ export const initialJournalSettings = {
   publisher: 'Gyan Akshar Sanskriti Foundation',
   publication_frequency: 'Quarterly (4 Issues Per Year)',
   language: 'English',
-  contact_email: 'editor.IJRT.in@gmail.com',
+  contact_email: 'editor.ijrtonline@gmail.com',
   alternate_email: '',
   phone: '+91 (011) 2874-5690',
   postal_address: 'IJRT Editorial Office, Center for Academic Research & Excellence, Sector 12, Dwarka, New Delhi 110075, India',
@@ -243,7 +243,7 @@ export const initialEditorialMembers = [
     institution: 'Sarvepalli Radhakrishnan University',
     department: 'Department of Electrical Engineering',
     country: 'India',
-    email: 'editor.IJRT.in@gmail.com',
+    email: 'editor.ijrtonline@gmail.com',
     orcid: '',
     photo_url: '',
     bio: 'Professor of Electrical Engineering at Sarvepalli Radhakrishnan University, Bhopal.',
@@ -907,7 +907,7 @@ export const initialAnnouncements = [
   {
     id: 'ann-1',
     title: 'Call for Papers',
-    message: 'Volume 1, Issue 3 (July–September 2026) is now open for submissions. Submit your manuscript to editor.IJRT.in@gmail.com',
+    message: 'Volume 1, Issue 3 (July–September 2026) is now open for submissions. Submit your manuscript to editor.ijrtonline@gmail.com',
     type: 'call_for_papers',
     expires_at: '2026-06-30',
     is_active: true,
@@ -919,5 +919,6 @@ export const initialAnnouncements = [
 // CONFERENCES DATA
 // ========================================================
 export const initialConferences = [];
+
 
 

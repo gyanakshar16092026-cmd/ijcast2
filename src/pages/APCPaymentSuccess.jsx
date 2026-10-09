@@ -158,8 +158,8 @@ export const APCPaymentSuccess = () => {
               <div className="space-y-1">
                 <div>
                   <span className="text-slate-500 text-xs">Primary: </span>
-                  <a href="mailto:editor.IJRT.in@gmail.com" className="text-amber-600 hover:underline font-semibold">
-                    editor.IJRT.in@gmail.com
+                  <a href="mailto:editor.ijrtonline@gmail.com" className="text-amber-600 hover:underline font-semibold">
+                    editor.ijrtonline@gmail.com
                   </a>
                 </div>
                 <div>
@@ -176,4 +176,5 @@ export const APCPaymentSuccess = () => {
     </div>
   );
 };
+
 

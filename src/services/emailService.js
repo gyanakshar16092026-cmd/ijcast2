@@ -103,7 +103,7 @@ Please review this submission in the editorial system.
         submission_id: submission.submission_id,
         
         // Editorial contacts
-        primary_email: 'editor.ijrt.in@gmail.com',
+        primary_email: 'editor.ijrtonline@gmail.com',
         admin_email: 'gyanakshar16092026@gmail.com',
         
         // Email content - using message field for template
@@ -123,7 +123,7 @@ ${paymentUrl}
 Your paper will be published immediately after payment confirmation and will be freely accessible forever as per our open access policy.
 
 For any queries, please contact us at:
-• Primary: editor.ijrt.in@gmail.com
+• Primary: editor.ijrtonline@gmail.com
 • Administrative: gyanakshar16092026@gmail.com
 
 Thank you for choosing IJRT for your research publication.
@@ -195,7 +195,7 @@ IJRT - International Journal of Research in Technology
         published_date: new Date().toLocaleDateString('en-GB'),
         
         // Editorial contacts
-        primary_email: 'editor.ijrt.in@gmail.com',
+        primary_email: 'editor.ijrtonline@gmail.com',
         admin_email: 'gyanakshar16092026@gmail.com',
         
         // Email content
@@ -224,7 +224,7 @@ Your research is now part of the permanent scholarly record and will contribute 
 Thank you for choosing IJRT for your research publication. We appreciate your contribution to the scientific community.
 
 For any queries, please contact us at:
-• Primary: editor.ijrt.in@gmail.com  
+• Primary: editor.ijrtonline@gmail.com  
 • Administrative: gyanakshar16092026@gmail.com
 
 Best regards,
@@ -318,7 +318,7 @@ VITE_EMAILJS_SUBMISSION_TEMPLATE_ID=your_template_id
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 TO: ${submission.author_email}
-CC: editor.ijrt.in@gmail.com, gyanakshar16092026@gmail.com
+CC: editor.ijrtonline@gmail.com, gyanakshar16092026@gmail.com
 SUBJECT: Paper Accepted - ${submission.paper_title} - IJRT
 
 Dear ${submission.author_name},
@@ -337,7 +337,7 @@ PAYMENT LINK:
 ${paymentUrl}
 
 CONTACTS:
-• Primary: editor.ijrt.in@gmail.com
+• Primary: editor.ijrtonline@gmail.com
 • Admin: gyanakshar16092026@gmail.com
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -357,7 +357,7 @@ VITE_EMAILJS_ACCEPTANCE_TEMPLATE_ID=your_template_id
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 TO: ${submission.author_email}
-CC: editor.ijrt.in@gmail.com, gyanakshar16092026@gmail.com
+CC: editor.ijrtonline@gmail.com, gyanakshar16092026@gmail.com
 SUBJECT: 🎉 Your Paper is Published - ${submission.paper_title}
 
 Dear ${submission.author_name},
@@ -386,7 +386,7 @@ Your research is now freely accessible worldwide!
         },
         body: JSON.stringify({
           to: submission.author_email,
-          cc: ['editor.ijrt.in@gmail.com', 'gyanakshar16092026@gmail.com'],
+          cc: ['editor.ijrtonline@gmail.com', 'gyanakshar16092026@gmail.com'],
           subject: `Paper Accepted - ${submission.paper_title} - IJRT`,
           submission: submission
         })
@@ -407,5 +407,6 @@ Your research is now freely accessible worldwide!
 }
 
 export const emailService = new EmailService();
+
 
 

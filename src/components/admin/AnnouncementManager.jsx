@@ -120,7 +120,7 @@ export const AnnouncementManager = () => {
             <div>
               <label className="block text-slate-300 mb-1">Full Message *</label>
               <textarea required rows={3} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })}
-                placeholder="e.g. Submissions are open for Issue 1. Submit manuscripts to editor.IJRT.in@gmail.com by December 31, 2026."
+                placeholder="e.g. Submissions are open for Issue 1. Submit manuscripts to editor.ijrtonline@gmail.com by December 31, 2026."
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white resize-none" />
             </div>
 
@@ -187,5 +187,6 @@ export const AnnouncementManager = () => {
     </div>
   );
 };
+
 
 
