@@ -42,7 +42,7 @@ export const Refunds = () => {
             1. General Refund Policy
           </h2>
           <p className="text-sm text-slate-700 leading-relaxed">
-            IJCAST follows a fair and transparent refund policy. All refund requests are evaluated on a case-by-case 
+            IJRT follows a fair and transparent refund policy. All refund requests are evaluated on a case-by-case 
             basis considering the stage of manuscript processing and the reason for withdrawal.
           </p>
         </section>
@@ -331,3 +331,4 @@ export const Refunds = () => {
     </div>
   );
 };
+

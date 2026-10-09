@@ -75,7 +75,7 @@ export const EditorialBoard = () => {
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold font-serif">Editorial Board</h1>
         <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
-          Distinguished academic scholars overseeing the scientific rigor, peer-review standards, and publication ethics of IJCAST.
+          Distinguished academic scholars overseeing the scientific rigor, peer-review standards, and publication ethics of IJRT.
         </p>
       </div>
 
@@ -171,3 +171,4 @@ export const EditorialBoard = () => {
     </div>
   );
 };
+

@@ -71,7 +71,7 @@ export const PaymentFailed = () => {
                 <p className="font-medium">Contact our support team</p>
                 <p className="flex items-center gap-1">
                   <Mail className="w-3 h-3" />
-                  editor@ijcast.in
+                  editor@ijrt.in
                 </p>
                 <p>Include your reference ID for faster assistance</p>
               </div>

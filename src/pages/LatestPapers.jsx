@@ -377,3 +377,4 @@ export const LatestPapers = () => {
     </div>
   );
 };
+

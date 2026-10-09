@@ -14,7 +14,9 @@ EmailJS allows you to send emails directly from your React app without a backend
 2. Choose **Gmail** (recommended)
 3. Connect your Gmail account (`editor.ijcast.in@gmail.com`)
 4. Note down the **Service ID** (looks like `service_xxxxxxx`)
-
+service_3t96x0h
+SYDuB88Ya82DphWbk p
+template_wkpicqg
 ### Step 3: Create Email Template
 1. Click **"Create New Template"**
 2. Use this template content:

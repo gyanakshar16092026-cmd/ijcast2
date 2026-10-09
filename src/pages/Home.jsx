@@ -174,7 +174,7 @@ export const Home = () => {
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Indexed In</h2>
-            <p className="text-gray-600">IJCAST is indexed in prestigious academic databases and platforms</p>
+            <p className="text-gray-600">IJRT is indexed in prestigious academic databases and platforms</p>
           </div>
           
           {/* Indexing Logos Grid */}
@@ -279,3 +279,4 @@ export const Home = () => {
     </div>
   );
 };
+

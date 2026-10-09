@@ -90,7 +90,7 @@ Please review this submission in the editorial system.
       }
 
       // Generate payment link
-      const paymentUrl = 'https://www.ijcast.in/apc';
+      const paymentUrl = 'https://www.ijrt.in/apc';
       
       // Prepare email data for EmailJS acceptance template
       const templateParams = {
@@ -103,14 +103,14 @@ Please review this submission in the editorial system.
         submission_id: submission.submission_id,
         
         // Editorial contacts
-        primary_email: 'editor.ijcast.in@gmail.com',
+        primary_email: 'editor.ijrt.in@gmail.com',
         admin_email: 'gyanakshar16092026@gmail.com',
         
         // Email content - using message field for template
         message: `
 Dear ${submission.author_name},
 
-We are pleased to inform you that your manuscript titled "${submission.paper_title}" (ID: ${submission.submission_id}) has been accepted for publication in the International Journal of Commerce, Arts, Science and Technology (IJCAST).
+We are pleased to inform you that your manuscript titled "${submission.paper_title}" (ID: ${submission.submission_id}) has been accepted for publication in the International Journal of Research in Technology (IJRT).
 
 Next Steps:
 1. Payment: Please complete the Article Processing Charge (APC) payment of ₹2000 for Indian authors
@@ -123,14 +123,14 @@ ${paymentUrl}
 Your paper will be published immediately after payment confirmation and will be freely accessible forever as per our open access policy.
 
 For any queries, please contact us at:
-• Primary: editor.ijcast.in@gmail.com
+• Primary: editor.ijrt.in@gmail.com
 • Administrative: gyanakshar16092026@gmail.com
 
-Thank you for choosing IJCAST for your research publication.
+Thank you for choosing IJRT for your research publication.
 
 Best regards,
 Editorial Team
-IJCAST - International Journal of Commerce, Arts, Science and Technology
+IJRT - International Journal of Research in Technology
         `
       };
 
@@ -166,7 +166,7 @@ IJCAST - International Journal of Commerce, Arts, Science and Technology
         success: true, 
         method: 'console',
         error: error.message,
-        paymentUrl: 'https://www.ijcast.in/apc'
+        paymentUrl: 'https://www.ijrt.in/apc'
       };
     }
   }
@@ -195,7 +195,7 @@ IJCAST - International Journal of Commerce, Arts, Science and Technology
         published_date: new Date().toLocaleDateString('en-GB'),
         
         // Editorial contacts
-        primary_email: 'editor.ijcast.in@gmail.com',
+        primary_email: 'editor.ijrt.in@gmail.com',
         admin_email: 'gyanakshar16092026@gmail.com',
         
         // Email content
@@ -204,7 +204,7 @@ Dear ${submission.author_name},
 
 🎉 CONGRATULATIONS! Your paper has been PUBLISHED!
 
-We are delighted to inform you that your manuscript titled "${submission.paper_title}" (ID: ${submission.submission_id}) has been successfully published in IJCAST and is now freely accessible to the global research community.
+We are delighted to inform you that your manuscript titled "${submission.paper_title}" (ID: ${submission.submission_id}) has been successfully published in IJRT and is now freely accessible to the global research community.
 
 📄 Your Published Paper:
 • Title: ${submission.paper_title}
@@ -221,15 +221,15 @@ We are delighted to inform you that your manuscript titled "${submission.paper_t
 
 Your research is now part of the permanent scholarly record and will contribute to advancing knowledge in your field.
 
-Thank you for choosing IJCAST for your research publication. We appreciate your contribution to the scientific community.
+Thank you for choosing IJRT for your research publication. We appreciate your contribution to the scientific community.
 
 For any queries, please contact us at:
-• Primary: editor.ijcast.in@gmail.com  
+• Primary: editor.ijrt.in@gmail.com  
 • Administrative: gyanakshar16092026@gmail.com
 
 Best regards,
 Editorial Team
-IJCAST - International Journal of Commerce, Arts, Science and Technology
+IJRT - International Journal of Research in Technology
 
 ---
 This is an automated notification. Your paper is now live and accessible worldwide.
@@ -310,7 +310,7 @@ VITE_EMAILJS_SUBMISSION_TEMPLATE_ID=your_template_id
 
   // Fallback method - log acceptance email details to console
   logAcceptanceEmail(submission) {
-    const paymentUrl = 'https://www.ijcast.in/apc';
+    const paymentUrl = 'https://www.ijrt.in/apc';
     
     console.log(`
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -318,7 +318,7 @@ VITE_EMAILJS_SUBMISSION_TEMPLATE_ID=your_template_id
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 TO: ${submission.author_email}
-CC: editor.ijcast.in@gmail.com, gyanakshar16092026@gmail.com
+CC: editor.ijrt.in@gmail.com, gyanakshar16092026@gmail.com
 SUBJECT: Paper Accepted - ${submission.paper_title} - IJCAST
 
 Dear ${submission.author_name},
@@ -337,7 +337,7 @@ PAYMENT LINK:
 ${paymentUrl}
 
 CONTACTS:
-• Primary: editor.ijcast.in@gmail.com
+• Primary: editor.ijrt.in@gmail.com
 • Admin: gyanakshar16092026@gmail.com
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -357,7 +357,7 @@ VITE_EMAILJS_ACCEPTANCE_TEMPLATE_ID=your_template_id
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 TO: ${submission.author_email}
-CC: editor.ijcast.in@gmail.com, gyanakshar16092026@gmail.com
+CC: editor.ijrt.in@gmail.com, gyanakshar16092026@gmail.com
 SUBJECT: 🎉 Your Paper is Published - ${submission.paper_title}
 
 Dear ${submission.author_name},
@@ -386,7 +386,7 @@ Your research is now freely accessible worldwide!
         },
         body: JSON.stringify({
           to: submission.author_email,
-          cc: ['editor.ijcast.in@gmail.com', 'gyanakshar16092026@gmail.com'],
+          cc: ['editor.ijrt.in@gmail.com', 'gyanakshar16092026@gmail.com'],
           subject: `Paper Accepted - ${submission.paper_title} - IJCAST`,
           submission: submission
         })
@@ -407,3 +407,4 @@ Your research is now freely accessible worldwide!
 }
 
 export const emailService = new EmailService();
+

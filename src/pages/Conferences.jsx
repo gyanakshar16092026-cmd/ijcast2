@@ -21,7 +21,7 @@ export function Conferences() {
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold font-serif">Conferences</h1>
         <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
-          Conference proceedings, presented papers and reports from academic conferences organized or associated with IJCAST and Gyan Akshar Sanskriti Foundation.
+          Conference proceedings, presented papers and reports from academic conferences organized or associated with IJRT and Gyan Akshar Sanskriti Foundation.
         </p>
 
         {/* Stats */}
@@ -176,3 +176,4 @@ export function Conferences() {
     </div>
   );
 }
+

@@ -39,7 +39,7 @@ export const ResearchAreas = () => {
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold font-serif">Research Areas & Scope</h1>
         <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
-          IJCAST is a multidisciplinary journal that covers a broad range of subjects. The following categories represent the primary research areas covered by the journal. Interdisciplinary research involving two or more disciplines is also welcome.
+          IJRT is a multidisciplinary journal that covers a broad range of subjects. The following categories represent the primary research areas covered by the journal. Interdisciplinary research involving two or more disciplines is also welcome.
         </p>
       </div>
 
@@ -81,3 +81,4 @@ export const ResearchAreas = () => {
     </div>
   );
 };
+

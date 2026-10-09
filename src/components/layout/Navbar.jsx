@@ -26,8 +26,8 @@ export const Navbar = () => {
         {/* Brand Logo & Name */}
         <Link to="/" className="flex items-center space-x-3 group">
           <img
-            src="/ijcast-logo.png"
-            alt="IJCAST Logo"
+            src="/logo.png"
+            alt="IJRT Logo"
             className="w-12 h-12 rounded-full object-cover shadow-md group-hover:scale-105 transition-transform border-2 border-amber-500/30"
           />
           <div>
@@ -131,3 +131,4 @@ export const Navbar = () => {
     </header>
   );
 };
+

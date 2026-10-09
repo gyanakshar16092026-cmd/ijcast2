@@ -238,7 +238,7 @@ export const SubmitPaper = () => {
                 <br/>
                 <strong>3. Publication:</strong> After payment confirmation, your paper will be published on the website with free access forever.
                 <br/><br/>
-                Please save your submission ID for future reference. Thank you for choosing IJCAST!
+                Please save your submission ID for future reference. Thank you for choosing IJRT!
               </p>
               
               <button
@@ -658,3 +658,4 @@ export const SubmitPaper = () => {
     </div>
   );
 };
+

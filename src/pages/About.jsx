@@ -15,7 +15,7 @@ export const About = () => {
     if (validTabs.includes(id)) setActiveTab(id);
   }, [hash]);
 
-  const historyContent = pageContents.find(p => p.page_key === 'about' && p.section_key === 'history')?.content || `The **International Journal of Commerce, Arts, Science and Technology (IJCAST)** was originally established to provide a dedicated academic forum bridging foundational humanities with rapid technological advancements. 
+  const historyContent = pageContents.find(p => p.page_key === 'about' && p.section_key === 'history')?.content || `The **International Journal of Research in Technology (IJRT)** was originally established to provide a dedicated academic forum for technology research and innovation. 
 
 Following a strategic editorial revitalization in 2026, IJCAST was relaunched as a modernized, open-access, multidisciplinary peer-reviewed publication. The journal continues its legacy of rigorous academic oversight while introducing seamless digital archiving, universal DOI integration, and enhanced editorial standards.`;
 
@@ -36,9 +36,9 @@ Following a strategic editorial revitalization in 2026, IJCAST was relaunched as
         <div className="inline-flex items-center space-x-2 px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-full text-xs font-semibold uppercase">
           <span>Journal Profile & Policies</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-bold font-serif">About IJCAST Journal</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold font-serif">About IJRT Journal</h1>
         <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
-          Comprehensive information regarding the International Journal of Commerce, Arts, Science and Technology, its editorial ethos, historical relaunch, and publishing framework.
+          Comprehensive information regarding the International Journal of Research in Technology, its editorial ethos, and publishing framework.
         </p>
       </div>
 
@@ -68,9 +68,9 @@ Following a strategic editorial revitalization in 2026, IJCAST was relaunched as
       <div id="tab-content" className="bg-white p-8 sm:p-10 rounded-2xl border border-slate-200 shadow-sm space-y-6">
         {activeTab === 'about' && (
           <div id="about" className="space-y-4">
-            <h2 className="text-2xl font-bold font-serif text-slate-900 border-b border-slate-100 pb-3">About IJCAST</h2>
+            <h2 className="text-2xl font-bold font-serif text-slate-900 border-b border-slate-100 pb-3">About IJRT</h2>
             <p className="text-sm text-slate-700 leading-relaxed">
-              The <strong>International Journal of Commerce, Arts, Science and Technology (IJCAST)</strong> is a peer-reviewed multidisciplinary academic journal. IJCAST provides an open-access platform for academics, scientists, research scholars, and industry professionals to publish innovative theoretical models and empirical research findings.
+              The <strong>International Journal of Research in Technology (IJRT)</strong> is a peer-reviewed academic journal. IJRT provides an open-access platform for academics, scientists, research scholars, and industry professionals to publish innovative research findings in technology and related fields.
             </p>
             <p className="text-sm text-slate-700 leading-relaxed">
               The journal enforces double-blind peer review to maintain high editorial standards, ensuring all published works contribute substantially to global academic literature.
@@ -190,3 +190,4 @@ Following a strategic editorial revitalization in 2026, IJCAST was relaunched as
     </div>
   );
 };
+

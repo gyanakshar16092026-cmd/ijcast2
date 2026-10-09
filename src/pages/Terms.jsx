@@ -16,7 +16,7 @@ export const Terms = () => {
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold font-serif">Terms & Conditions</h1>
         <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
-          Terms of service governing the use of IJCAST website, manuscript submission, and publication services.
+          Terms of service governing the use of IJRT website, manuscript submission, and publication services.
         </p>
       </div>
 
@@ -29,7 +29,7 @@ export const Terms = () => {
             1. Acceptance of Terms
           </h2>
           <p className="text-sm text-slate-700 leading-relaxed">
-            By accessing and using the International Journal of Computer Applications in Science and Technology (IJCAST) website 
+            By accessing and using the International Journal of Research in Technology (IJRT) website 
             and services, you accept and agree to be bound by the terms and provisions of this agreement. If you do not agree 
             to these terms, please do not use this website or submit manuscripts.
           </p>
@@ -41,7 +41,7 @@ export const Terms = () => {
             2. Services Offered
           </h2>
           <p className="text-sm text-slate-700 leading-relaxed font-semibold mb-2">
-            IJCAST provides the following services:
+            IJRT provides the following services:
           </p>
           <ul className="list-disc pl-5 space-y-2 text-sm text-slate-700">
             <li>
@@ -77,7 +77,7 @@ export const Terms = () => {
             3. User Responsibilities
           </h2>
           <p className="text-sm text-slate-700 leading-relaxed">
-            Authors submitting to IJCAST agree to:
+            Authors submitting to IJRT agree to:
           </p>
           <ul className="list-disc pl-5 space-y-1.5 text-sm text-slate-700">
             <li>Submit original research work that has not been published elsewhere</li>
@@ -180,7 +180,7 @@ export const Terms = () => {
             9. Privacy and Data Protection
           </h2>
           <p className="text-sm text-slate-700 leading-relaxed">
-            IJCAST respects user privacy and handles personal data in accordance with our 
+            IJRT respects user privacy and handles personal data in accordance with our 
             <a href="/privacy" className="text-blue-600 hover:underline ml-1">Privacy Policy</a>. 
             Author information is used solely for publication and correspondence purposes.
           </p>
@@ -192,7 +192,7 @@ export const Terms = () => {
             10. Limitation of Liability
           </h2>
           <p className="text-sm text-slate-700 leading-relaxed">
-            IJCAST and its publisher shall not be liable for any indirect, incidental, special, 
+            IJRT and its publisher shall not be liable for any indirect, incidental, special, 
             consequential, or punitive damages arising from the use of this website or services. 
             The maximum liability shall be limited to the amount of APC paid for the specific article.
           </p>
@@ -204,7 +204,7 @@ export const Terms = () => {
             11. Modifications to Terms
           </h2>
           <p className="text-sm text-slate-700 leading-relaxed">
-            IJCAST reserves the right to modify these terms at any time. Changes will be effective 
+            IJRT reserves the right to modify these terms at any time. Changes will be effective 
             immediately upon posting to the website. Continued use of the website after changes 
             constitutes acceptance of the modified terms.
           </p>
@@ -246,3 +246,5 @@ export const Terms = () => {
     </div>
   );
 };
+
+

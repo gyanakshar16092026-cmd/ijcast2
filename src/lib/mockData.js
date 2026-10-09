@@ -5,8 +5,8 @@
 
 export const initialJournalSettings = {
   id: 'setting-1',
-  journal_name: 'International Journal of Commerce, Arts, Science and Technology',
-  short_name: 'IJCAST',
+  journal_name: 'International Journal of Research in Technology',
+  short_name: 'IJRT',
   issn: '2394-9007',
   eissn: '2394-9007',
   doi_prefix: '10.5281/ijcast',
@@ -263,7 +263,7 @@ export const initialEditorialMembers = [
     email: '',
     orcid: '',
     photo_url: '',
-    bio: 'Ph.D. in Computer Science. Managing Editor of IJCAST and Independent Researcher.',
+    bio: 'Ph.D. in Computer Science. Managing Editor of IJRT and Independent Researcher.',
     research_area: 'Computer Science & Technology',
     is_active: true,
     sort_order: 2
@@ -805,10 +805,10 @@ export const initialPageContent = [
     id: 'pg-1',
     page_key: 'about',
     section_key: 'history',
-    title: 'Journal History & Revival Relaunch',
-    content: `The **International Journal of Commerce, Arts, Science and Technology (IJCAST)** was originally established to provide a dedicated academic forum bridging foundational humanities with rapid technological advancements. 
+    title: 'Journal History',
+    content: `The **International Journal of Research in Technology (IJRT)** was established to provide a dedicated academic forum for technology research and innovation. 
 
-Following a strategic editorial revitalization in 2026, IJCAST was relaunched as a modernized, open-access, multidisciplinary peer-reviewed publication. The journal continues its legacy of rigorous academic oversight while introducing seamless digital archiving, universal DOI integration, and enhanced editorial standards.`
+IJRT serves as a modernized, open-access, peer-reviewed publication with rigorous academic oversight, seamless digital archiving, universal DOI integration, and enhanced editorial standards.`
   },
   {
     id: 'pg-2',
@@ -847,7 +847,7 @@ IJCAST provides partial or full fee waivers for researchers from low-income econ
     page_key: 'privacy',
     section_key: 'editorial_privacy',
     title: 'Privacy & Data Protection Policy',
-    content: `The names, institutional affiliations, and email addresses entered into the IJCAST website will be used exclusively for the stated academic purposes of this journal. They will not be made available for any other purpose or shared with third parties.`
+    content: `The names, institutional affiliations, and email addresses entered into the IJRT website will be used exclusively for the stated academic purposes of this journal. They will not be made available for any other purpose or shared with third parties.`
   }
 ];
 
@@ -919,3 +919,4 @@ export const initialAnnouncements = [
 // CONFERENCES DATA
 // ========================================================
 export const initialConferences = [];
+

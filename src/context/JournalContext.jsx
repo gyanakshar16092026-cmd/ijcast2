@@ -1345,3 +1345,4 @@ export const useJournal = () => {
   }
   return context;
 };
+

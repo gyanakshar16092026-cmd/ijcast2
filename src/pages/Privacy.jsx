@@ -5,7 +5,7 @@ import { ShieldCheck, Lock } from 'lucide-react';
 export const Privacy = () => {
   const { settings, pageContents } = useJournal();
 
-  const privacyContent = pageContents.find(p => p.page_key === 'privacy' && p.section_key === 'editorial_privacy')?.content || `The names, institutional affiliations, and email addresses entered into the IJCAST website will be used exclusively for the stated academic purposes of this journal. They will not be made available for any other purpose or shared with third parties.`;
+  const privacyContent = pageContents.find(p => p.page_key === 'privacy' && p.section_key === 'editorial_privacy')?.content || `The names, institutional affiliations, and email addresses entered into the IJRT website will be used exclusively for the stated academic purposes of this journal. They will not be made available for any other purpose or shared with third parties.`;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-8 py-12 space-y-10">
@@ -40,3 +40,4 @@ export const Privacy = () => {
     </div>
   );
 };
+

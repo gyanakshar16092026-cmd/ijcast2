@@ -94,3 +94,4 @@ export const Contact = () => {
     </div>
   );
 };
+

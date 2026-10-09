@@ -31,7 +31,7 @@ export const Copyright = () => {
         <div className="space-y-3">
           <h2 className="text-xl font-bold font-serif text-slate-900 border-b border-slate-100 pb-2">2. Reader Reuse & Licensing Terms</h2>
           <p className="text-sm text-slate-700 leading-relaxed">
-            Unless otherwise specified, all articles published in IJCAST are licensed under the <strong>{settings.license_name || 'Creative Commons Attribution 4.0 International License (CC BY 4.0)'}</strong>.
+            Unless otherwise specified, all articles published in IJRT are licensed under the <strong>{settings.license_name || 'Creative Commons Attribution 4.0 International License (CC BY 4.0)'}</strong>.
           </p>
           <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 space-y-2">
             <p className="font-semibold text-slate-900">Under CC BY 4.0 terms, readers are free to:</p>
@@ -54,3 +54,4 @@ export const Copyright = () => {
     </div>
   );
 };
+
