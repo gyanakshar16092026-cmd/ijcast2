@@ -28,7 +28,7 @@ export const Navbar = () => {
           <img
             src="/logo.png"
             alt="IJRT Logo"
-            className="w-12 h-12 rounded-full object-cover shadow-md group-hover:scale-105 transition-transform border-2 border-amber-500/30"
+            className="h-14 w-auto object-contain shadow-sm group-hover:scale-105 transition-transform"
           />
           <div>
             <h1 className="text-lg font-bold font-serif tracking-tight text-slate-900 group-hover:text-amber-600 transition-colors leading-snug">
