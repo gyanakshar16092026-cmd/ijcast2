@@ -74,7 +74,7 @@ export const SettingsManager = () => {
                 type="text"
                 value={formData.doi_prefix}
                 onChange={e => setFormData({ ...formData, doi_prefix: e.target.value })}
-                placeholder="10.5281/ijcast"
+                placeholder="10.5281/IJRT"
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono"
               />
             </div>
@@ -208,4 +208,5 @@ export const SettingsManager = () => {
     </div>
   );
 };
+
 

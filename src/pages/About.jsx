@@ -17,10 +17,10 @@ export const About = () => {
 
   const historyContent = pageContents.find(p => p.page_key === 'about' && p.section_key === 'history')?.content || `The **International Journal of Research in Technology (IJRT)** was originally established to provide a dedicated academic forum for technology research and innovation. 
 
-Following a strategic editorial revitalization in 2026, IJCAST was relaunched as a modernized, open-access, multidisciplinary peer-reviewed publication. The journal continues its legacy of rigorous academic oversight while introducing seamless digital archiving, universal DOI integration, and enhanced editorial standards.`;
+Following a strategic editorial revitalization in 2026, IJRT was relaunched as a modernized, open-access, multidisciplinary peer-reviewed publication. The journal continues its legacy of rigorous academic oversight while introducing seamless digital archiving, universal DOI integration, and enhanced editorial standards.`;
 
   const tabs = [
-    { id: 'about', label: 'About IJCAST', icon: BookOpen },
+    { id: 'about', label: 'About IJRT', icon: BookOpen },
     { id: 'aims', label: 'Aims & Objectives', icon: Target },
     { id: 'scope', label: 'Scope of Journal', icon: Compass },
     { id: 'history', label: 'Journal History', icon: History },
@@ -94,7 +94,7 @@ Following a strategic editorial revitalization in 2026, IJCAST was relaunched as
           <div className="space-y-4">
             <h2 className="text-2xl font-bold font-serif text-slate-900 border-b border-slate-100 pb-3">Scope of the Journal</h2>
             <p className="text-sm text-slate-700 leading-relaxed">
-              IJCAST accepts papers across eight core multidisciplinary domains:
+              IJRT accepts papers across eight core multidisciplinary domains:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
               {[
@@ -131,7 +131,7 @@ Following a strategic editorial revitalization in 2026, IJCAST was relaunched as
           <div className="space-y-6">
             <h2 className="text-2xl font-bold font-serif text-slate-900 border-b border-slate-100 pb-3">Publication Frequency</h2>
             <p className="text-sm text-slate-700 leading-relaxed">
-              IJCAST publishes on a <strong>Bimonthly</strong> schedule — <strong>6 issues per volume year</strong>. Each issue covers a 2-month period as follows:
+              IJRT publishes on a <strong>Bimonthly</strong> schedule — <strong>6 issues per volume year</strong>. Each issue covers a 2-month period as follows:
             </p>
 
             {/* 6 Bimonthly issue cards */}
@@ -167,7 +167,7 @@ Following a strategic editorial revitalization in 2026, IJCAST was relaunched as
           <div className="space-y-4">
             <h2 className="text-2xl font-bold font-serif text-slate-900 border-b border-slate-100 pb-3">Open Access Policy</h2>
             <p className="text-sm text-slate-700 leading-relaxed">
-              {settings.open_access_statement || 'IJCAST is an open access journal. All published articles are immediately available online without subscription fees.'}
+              {settings.open_access_statement || 'IJRT is an open access journal. All published articles are immediately available online without subscription fees.'}
             </p>
             <p className="text-sm text-slate-700 leading-relaxed">
               Articles are licensed under the Creative Commons Attribution 4.0 International License (CC BY 4.0), permitting unrestricted use, distribution, and reproduction in any medium, provided the original work is properly cited.
@@ -190,4 +190,5 @@ Following a strategic editorial revitalization in 2026, IJCAST was relaunched as
     </div>
   );
 };
+
 

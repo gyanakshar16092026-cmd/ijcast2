@@ -1,4 +1,4 @@
-// Frontend Payment Service for IJCAST APC Payments
+// Frontend Payment Service for IJRT APC Payments
 import { supabase } from '../lib/supabase';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -280,3 +280,4 @@ export class PaymentService {
     };
   }
 }
+

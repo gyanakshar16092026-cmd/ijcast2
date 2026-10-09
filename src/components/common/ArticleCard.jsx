@@ -13,7 +13,7 @@ export const ArticleCard = ({ article }) => {
   const volObj = issueObj ? volumes.find(v => v.id === issueObj.volume_id) : null;
 
   // Citation generator formatting
-  const mainAuthor = article.authors?.[0]?.name || 'IJCAST Author';
+  const mainAuthor = article.authors?.[0]?.name || 'IJRT Author';
   // PHASE 11: Use current year as fallback instead of hardcoded 2026  
   const yearStr = issueObj ? issueObj.year : new Date().getFullYear();
   const volStr = volObj ? `Vol. ${volObj.volume_number}` : '';
@@ -186,4 +186,5 @@ export const ArticleCard = ({ article }) => {
     </div>
   );
 };
+
 

@@ -76,10 +76,10 @@ export const JournalProvider = ({ children }) => {
   // Load from Supabase if configured
   useEffect(() => {
     // Clear stale large localStorage keys that caused QuotaExceededError
-    ['ijcast_articles', 'ijcast_articles_v2', 'ijcast_volumes', 'ijcast_volumes_v2',
-     'ijcast_issues', 'ijcast_issues_v2', 'ijcast_editorial', 'ijcast_editorial_v2',
-     'ijcast_media', 'ijcast_media_v2', 'ijcast_theses', 'ijcast_theses_v2',
-     'ijcast_page_content', 'ijcast_page_content_v2'].forEach(key => {
+    ['IJRT_articles', 'IJRT_articles_v2', 'IJRT_volumes', 'IJRT_volumes_v2',
+     'IJRT_issues', 'IJRT_issues_v2', 'IJRT_editorial', 'IJRT_editorial_v2',
+     'IJRT_media', 'IJRT_media_v2', 'IJRT_theses', 'IJRT_theses_v2',
+     'IJRT_page_content', 'IJRT_page_content_v2'].forEach(key => {
       try { localStorage.removeItem(key); } catch {}
     });
 
@@ -129,12 +129,12 @@ export const JournalProvider = ({ children }) => {
         if (set) {
           const corrected = {
             ...set,
-            short_name: set.short_name || 'IJCAST',
+            short_name: set.short_name || 'IJRT',
             issn: (!set.issn || set.issn === 'ISSN XXXX-XXXX' || set.issn.includes('2349')) ? '2394-9007' : set.issn,
             eissn: (!set.eissn || set.eissn.includes('2349') || set.eissn === 'e-ISSN XXXX-XXXX') ? '2394-9007' : set.eissn,
-            contact_email: (!set.contact_email || set.contact_email === 'editor@ijcast.org' || set.contact_email === 'editor.ijcast@gmail.com' || set.contact_email === 'editor@ijcast.in') ? 'editor.ijcast.in@gmail.com' : set.contact_email,
+            contact_email: (!set.contact_email || set.contact_email === 'editor@IJRT.org' || set.contact_email === 'editor.IJRT@gmail.com' || set.contact_email === 'editor@IJRT.in') ? 'editor.IJRT.in@gmail.com' : set.contact_email,
             alternate_email: '',
-            publisher: (set.publisher === 'IJCAST Academic Research Publications Group' || !set.publisher)
+            publisher: (set.publisher === 'IJRT Academic Research Publications Group' || !set.publisher)
               ? 'Gyan Akshar Sanskriti Foundation'
               : set.publisher,
             publication_frequency: (set.publication_frequency === 'Quarterly (4 Issues Per Year) — Issue 1: Jan–Mar | Issue 2: Apr–Jun | Issue 3: Jul–Sep | Issue 4: Oct–Dec' || set.publication_frequency === 'Bimonthly (6 Issues Per Year)' || !set.publication_frequency)
@@ -146,7 +146,7 @@ export const JournalProvider = ({ children }) => {
             supabase.from('journal_settings').update({
               issn: corrected.issn, eissn: corrected.eissn, publisher: corrected.publisher,
               publication_frequency: corrected.publication_frequency,
-              contact_email: 'editor.ijcast.in@gmail.com', alternate_email: '',
+              contact_email: 'editor.IJRT.in@gmail.com', alternate_email: '',
             }).eq('id', set.id);
           }
         }
@@ -1047,7 +1047,7 @@ export const JournalProvider = ({ children }) => {
       revised_date: '',
       accepted_date: new Date().toISOString().split('T')[0],
       published_date: new Date().toISOString().split('T')[0],
-      doi: `10.5281/ijcast.${(submission.submission_id || '').replace(/[^a-zA-Z0-9]/g, '').slice(0, 20) || Date.now()}`,
+      doi: `10.5281/IJRT.${(submission.submission_id || '').replace(/[^a-zA-Z0-9]/g, '').slice(0, 20) || Date.now()}`,
       page_numbers: '1-12',
       pdf_url: submission.manuscript_file_url || '',
       html_content: '',
@@ -1082,7 +1082,7 @@ export const JournalProvider = ({ children }) => {
       if (result.success) {
         console.log(`✅ Acceptance email sent via ${result.method}:`, {
           to: submission.author_email,
-          cc: ['editor.ijcast.in@gmail.com', 'gyanakshar16092026@gmail.com'],
+          cc: ['editor.IJRT.in@gmail.com', 'gyanakshar16092026@gmail.com'],
           paymentUrl: result.paymentUrl
         });
         
@@ -1112,7 +1112,7 @@ export const JournalProvider = ({ children }) => {
       if (result.success) {
         console.log(`✅ Publication notification sent via ${result.method}:`, {
           to: submission.author_email,
-          cc: ['editor.ijcast.in@gmail.com', 'gyanakshar16092026@gmail.com'],
+          cc: ['editor.IJRT.in@gmail.com', 'gyanakshar16092026@gmail.com'],
           article: article.id
         });
         
@@ -1345,4 +1345,5 @@ export const useJournal = () => {
   }
   return context;
 };
+
 

@@ -31,7 +31,7 @@ const EmailTest = () => {
         // Test publication notification email
         const testArticle = {
           id: 'test-article-001',
-          doi: '10.5281/ijcast.test001',
+          doi: '10.5281/IJRT.test001',
           title: testSubmission.paper_title
         };
         emailResult = await emailService.sendPublicationNotificationEmail(testSubmission, testArticle);
@@ -185,3 +185,4 @@ const EmailTest = () => {
 };
 
 export default EmailTest;
+

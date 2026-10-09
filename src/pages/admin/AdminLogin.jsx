@@ -106,7 +106,7 @@ export const AdminLogin = () => {
             <p className="text-[11px] text-slate-500">
               Forgot password?{' '}
               <a
-                href="mailto:editor.ijcast.in@gmail.com"
+                href="mailto:editor.IJRT.in@gmail.com"
                 className="text-amber-400 hover:underline"
               >
                 Contact Administrator
@@ -118,4 +118,5 @@ export const AdminLogin = () => {
     </div>
   );
 };
+
 

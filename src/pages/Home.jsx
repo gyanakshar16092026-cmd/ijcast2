@@ -77,7 +77,7 @@ export const Home = () => {
                 </span>
                 <span className="text-gray-400">•</span>
                 <span className="inline-flex items-center space-x-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full font-medium">
-                  <span>MULTI-DISCIPLINARY JOURNAL</span>
+                  <span>SCIENCE, ENGINEERING & TECHNOLOGY</span>
                 </span>
                 <span className="text-gray-400">•</span>
                 <span className="inline-flex items-center space-x-1 px-3 py-1 bg-red-100 text-red-700 rounded-full font-bold">
@@ -92,10 +92,7 @@ export const Home = () => {
                   <span className="text-gray-900">International Journal of</span>
                 </h1>
                 <h2 className="text-4xl lg:text-5xl font-bold text-orange-600">
-                  Commerce, Arts, Science
-                </h2>
-                <h2 className="text-4xl lg:text-5xl font-bold text-gray-900">
-                  and Technology
+                  Research in Technology
                 </h2>
               </div>
 

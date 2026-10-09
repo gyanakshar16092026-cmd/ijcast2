@@ -32,7 +32,7 @@ export const Navbar = () => {
           />
           <div>
             <h1 className="text-lg font-bold font-serif tracking-tight text-slate-900 group-hover:text-amber-600 transition-colors leading-snug">
-              {settings.short_name || 'IJCAST'}
+              {settings.short_name || 'IJRT'}
             </h1>
             <p className="text-[11px] text-slate-500 font-sans tracking-wide">
               {settings.journal_name}
@@ -131,4 +131,5 @@ export const Navbar = () => {
     </header>
   );
 };
+
 

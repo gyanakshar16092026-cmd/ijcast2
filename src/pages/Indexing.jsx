@@ -15,7 +15,7 @@ export const Indexing = () => {
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold font-serif">Indexing & Abstracting</h1>
         <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
-          Official indexing repositories, digital databases, and scientific abstracting services listing IJCAST research publications.
+          Official indexing repositories, digital databases, and scientific abstracting services listing IJRT research publications.
         </p>
       </div>
 
@@ -76,4 +76,5 @@ export const Indexing = () => {
     </div>
   );
 };
+
 

@@ -5,7 +5,7 @@ import { ShieldCheck, CheckCircle2, AlertTriangle, FileText, Bot, RefreshCw } fr
 export const PublicationEthics = () => {
   const { pageContents } = useJournal();
 
-  const aiPolicyContent = pageContents.find(p => p.page_key === 'ethics' && p.section_key === 'ai_policy')?.content || `IJCAST adheres strictly to international publication standards regarding modern technology tools:
+  const aiPolicyContent = pageContents.find(p => p.page_key === 'ethics' && p.section_key === 'ai_policy')?.content || `IJRT adheres strictly to international publication standards regarding modern technology tools:
 1. **Authorship Eligibility**: Generative AI tools (e.g. ChatGPT, Claude, Copilot) cannot be credited as authors or co-authors. Authorship implies legal accountability and intellectual ownership.
 2. **Author Responsibility**: Authors remain 100% accountable for the originality, factual accuracy, data integrity, and citation fidelity of their manuscript.
 3. **Mandatory Disclosure**: Any substantive use of AI tools for data analysis, code generation, or draft synthesis must be explicitly disclosed in the Methods or Acknowledgments section.
@@ -35,7 +35,7 @@ export const PublicationEthics = () => {
             <span>Peer Review Policy</span>
           </h2>
           <p className="text-sm text-slate-700 leading-relaxed">
-            IJCAST enforces a rigorous <strong>double-blind peer-review process</strong>. Every submitted manuscript undergoes initial screening by the Editorial Board for scope and quality, followed by external evaluation by at least two independent expert peer reviewers. Reviewers assess original contributions, methodological soundness, ethical compliance, and clarity.
+            IJRT enforces a rigorous <strong>double-blind peer-review process</strong>. Every submitted manuscript undergoes initial screening by the Editorial Board for scope and quality, followed by external evaluation by at least two independent expert peer reviewers. Reviewers assess original contributions, methodological soundness, ethical compliance, and clarity.
           </p>
         </div>
 
@@ -73,11 +73,12 @@ export const PublicationEthics = () => {
             <span>Correction, Retraction & Withdrawal Policy</span>
           </h2>
           <p className="text-sm text-slate-700 leading-relaxed">
-            If errors are discovered post-publication, IJCAST publishes formal Corrigenda or Errata. Articles violating academic integrity, containing fabricated data, or infringing copyright will be formally retracted in accordance with COPE (Committee on Publication Ethics) guidelines.
+            If errors are discovered post-publication, IJRT publishes formal Corrigenda or Errata. Articles violating academic integrity, containing fabricated data, or infringing copyright will be formally retracted in accordance with COPE (Committee on Publication Ethics) guidelines.
           </p>
         </div>
       </div>
     </div>
   );
 };
+
 

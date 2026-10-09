@@ -1,5 +1,5 @@
 // ========================================================
-// IJCAST Academic Seed Data Layer
+// IJRT Academic Seed Data Layer
 // Supports dual-mode persistence (Supabase + Local Demo Store)
 // ========================================================
 
@@ -9,19 +9,19 @@ export const initialJournalSettings = {
   short_name: 'IJRT',
   issn: '2394-9007',
   eissn: '2394-9007',
-  doi_prefix: '10.5281/ijcast',
+  doi_prefix: '10.5281/IJRT',
   publisher: 'Gyan Akshar Sanskriti Foundation',
   publication_frequency: 'Quarterly (4 Issues Per Year)',
   language: 'English',
-  contact_email: 'editor.ijcast.in@gmail.com',
+  contact_email: 'editor.IJRT.in@gmail.com',
   alternate_email: '',
   phone: '+91 (011) 2874-5690',
-  postal_address: 'IJCAST Editorial Office, Center for Academic Research & Excellence, Sector 12, Dwarka, New Delhi 110075, India',
-  copyright_statement: 'Copyright © IJCAST. Authors retain full publishing rights under Open Access licensing.',
+  postal_address: 'IJRT Editorial Office, Center for Academic Research & Excellence, Sector 12, Dwarka, New Delhi 110075, India',
+  copyright_statement: 'Copyright © IJRT. Authors retain full publishing rights under Open Access licensing.',
   license_name: 'Creative Commons Attribution 4.0 International (CC BY 4.0)',
   license_url: 'https://creativecommons.org/licenses/by/4.0/',
   is_open_access: true,
-  open_access_statement: 'IJCAST is a peer-reviewed open access journal. All published articles are instantly available online for global readership without subscription walls.',
+  open_access_statement: 'IJRT is a peer-reviewed open access journal. All published articles are instantly available online for global readership without subscription walls.',
   impact_factor: null, // PHASE 5: Impact factor should come from database, not hardcoded
   updated_at: new Date().toISOString()
 };
@@ -163,7 +163,7 @@ export const initialArticles = [
     revised_date: '2026-01-28',
     accepted_date: '2026-02-10',
     published_date: '2026-02-28',
-    doi: '10.5281/ijcast.2026.101',
+    doi: '10.5281/IJRT.2026.101',
     page_numbers: '1–16',
     references: `1. Goodfellow, I., Bengio, Y., & Courville, A. (2016). Deep Learning. MIT Press.
 2. Sharma, R. V. (2024). Digital Transformations in Indian Banking Logistics. Journal of Financial Tech, 12(3), 45-62.
@@ -193,7 +193,7 @@ export const initialArticles = [
     revised_date: '2026-02-02',
     accepted_date: '2026-02-15',
     published_date: '2026-02-28',
-    doi: '10.5281/ijcast.2026.102',
+    doi: '10.5281/IJRT.2026.102',
     page_numbers: '17–32',
     references: `1. Vance, M., & Narang, P. (2025). Microgrid Stabilization Metrics. IEEE Transactions on Smart Grid, 16(2), 204-219.
 2. International Energy Agency (IEA). (2024). Suburban Energy Outlook Report.`,
@@ -221,7 +221,7 @@ export const initialArticles = [
     revised_date: '2026-03-01',
     accepted_date: '2026-03-20',
     published_date: '2026-04-30',
-    doi: '10.5281/ijcast.2026.103',
+    doi: '10.5281/IJRT.2026.103',
     page_numbers: '33–48',
     references: `1. Thorne, A. (2023). Computational Criticism in Modern Prose. Humanities Quarterly, 45(1), 12-29.
 2. Moretti, F. (2013). Distant Reading. Verso Books.`,
@@ -243,7 +243,7 @@ export const initialEditorialMembers = [
     institution: 'Sarvepalli Radhakrishnan University',
     department: 'Department of Electrical Engineering',
     country: 'India',
-    email: 'editor.ijcast.in@gmail.com',
+    email: 'editor.IJRT.in@gmail.com',
     orcid: '',
     photo_url: '',
     bio: 'Professor of Electrical Engineering at Sarvepalli Radhakrishnan University, Bhopal.',
@@ -815,7 +815,7 @@ IJRT serves as a modernized, open-access, peer-reviewed publication with rigorou
     page_key: 'ethics',
     section_key: 'ai_policy',
     title: 'AI / Generative AI Policy',
-    content: `IJCAST adheres strictly to international publication standards regarding modern technology tools:
+    content: `IJRT adheres strictly to international publication standards regarding modern technology tools:
 1. **Authorship Eligibility**: Generative AI tools (e.g. ChatGPT, Claude, Copilot) cannot be credited as authors or co-authors. Authorship implies legal accountability and intellectual ownership.
 2. **Author Responsibility**: Authors remain 100% accountable for the originality, factual accuracy, data integrity, and citation fidelity of their manuscript.
 3. **Mandatory Disclosure**: Any substantive use of AI tools for data analysis, code generation, or draft synthesis must be explicitly disclosed in the Methods or Acknowledgments section.
@@ -828,7 +828,7 @@ IJRT serves as a modernized, open-access, peer-reviewed publication with rigorou
     section_key: 'charges',
     title: 'Article Processing Charges & Refund Policy',
     content: `### Article Processing Charge (APC)
-IJCAST operates as an open-access journal. To cover typesetting, digital archiving, DOI registration, and server upkeep, a modest APC applies upon official manuscript acceptance:
+IJRT operates as an open-access journal. To cover typesetting, digital archiving, DOI registration, and server upkeep, a modest APC applies upon official manuscript acceptance:
 
 - **National Authors (India)**: INR 3,500
 - **International Authors**: USD 75
@@ -836,7 +836,7 @@ IJCAST operates as an open-access journal. To cover typesetting, digital archivi
 > **Important**: No fee is required upon initial submission or during the editorial screening & peer review phase. APC is payable strictly AFTER official acceptance.
 
 ### Waiver Policy
-IJCAST provides partial or full fee waivers for researchers from low-income economies or authors with demonstrated financial hardship upon editorial review.
+IJRT provides partial or full fee waivers for researchers from low-income economies or authors with demonstrated financial hardship upon editorial review.
 
 ### Refund Policy
 - If an author withdraws a manuscript **prior to formal acceptance**, no fee is charged.
@@ -907,7 +907,7 @@ export const initialAnnouncements = [
   {
     id: 'ann-1',
     title: 'Call for Papers',
-    message: 'Volume 1, Issue 3 (July–September 2026) is now open for submissions. Submit your manuscript to editor.ijcast.in@gmail.com',
+    message: 'Volume 1, Issue 3 (July–September 2026) is now open for submissions. Submit your manuscript to editor.IJRT.in@gmail.com',
     type: 'call_for_papers',
     expires_at: '2026-06-30',
     is_active: true,
@@ -919,4 +919,5 @@ export const initialAnnouncements = [
 // CONFERENCES DATA
 // ========================================================
 export const initialConferences = [];
+
 

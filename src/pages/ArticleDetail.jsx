@@ -27,7 +27,7 @@ export const ArticleDetail = () => {
   const issueObj = issues.find(i => i.id === article.issue_id);
   const volObj = issueObj ? volumes.find(v => v.id === issueObj.volume_id) : null;
 
-  const mainAuthor = article.authors?.[0]?.name || 'IJCAST Author';
+  const mainAuthor = article.authors?.[0]?.name || 'IJRT Author';
   // PHASE 11: Use current year as fallback instead of hardcoded 2026
   const yearStr = issueObj ? issueObj.year : new Date().getFullYear();
   const volStr = volObj ? `Vol. ${volObj.volume_number}` : '';
@@ -38,7 +38,7 @@ export const ArticleDetail = () => {
   // PHASE 11: Use actual volume/issue numbers from database, fallback to current year
   const apaCitation = `${mainAuthor} et al. (${yearStr}). ${article.title}. ${settings.journal_name}, ${volStr}(${issStr}), ${pagesStr}.${article.doi ? ` https://doi.org/${article.doi}` : ''}`;
   const mlaCitation = `${mainAuthor}, et al. "${article.title}." ${settings.journal_name}, vol. ${volObj?.volume_number || 'N/A'}, no. ${issueObj?.issue_number || 'N/A'}, ${yearStr}, pp. ${pagesStr}.`;
-  const bibtexCitation = `@article{ijcast_${article.id},\n  title={${article.title}},\n  author={${article.authors?.map(a => a.name).join(' and ')}},\n  journal={${settings.journal_name}},\n  volume={${volObj?.volume_number || 'N/A'}},\n  number={${issueObj?.issue_number || 'N/A'}},\n  pages={${pagesStr}},\n  year={${yearStr}}${article.doi ? `,\n  doi={${article.doi}}` : ''}\n}`;
+  const bibtexCitation = `@article{IJRT_${article.id},\n  title={${article.title}},\n  author={${article.authors?.map(a => a.name).join(' and ')}},\n  journal={${settings.journal_name}},\n  volume={${volObj?.volume_number || 'N/A'}},\n  number={${issueObj?.issue_number || 'N/A'}},\n  pages={${pagesStr}},\n  year={${yearStr}}${article.doi ? `,\n  doi={${article.doi}}` : ''}\n}`;
 
   const currentCitation = citationFormat === 'APA' ? apaCitation : citationFormat === 'MLA' ? mlaCitation : bibtexCitation;
 
@@ -275,4 +275,5 @@ export const ArticleDetail = () => {
     </div>
   );
 };
+
 

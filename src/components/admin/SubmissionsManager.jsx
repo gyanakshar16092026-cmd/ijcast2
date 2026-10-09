@@ -618,7 +618,7 @@ export const SubmissionsManager = () => {
                   <p className="text-xs text-slate-400 mb-1">Email Recipients:</p>
                   <div className="text-xs text-slate-300">
                     <div><strong>To:</strong> {emailModal.submission?.author_email}</div>
-                    <div><strong>CC:</strong> editor.ijcast.in@gmail.com, gyanakshar16092026@gmail.com</div>
+                    <div><strong>CC:</strong> editor.IJRT.in@gmail.com, gyanakshar16092026@gmail.com</div>
                   </div>
                 </div>
               </div>
@@ -746,4 +746,5 @@ export const SubmissionsManager = () => {
     </div>
   );
 };
+
 

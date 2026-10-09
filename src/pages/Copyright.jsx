@@ -24,7 +24,7 @@ export const Copyright = () => {
         <div className="space-y-3">
           <h2 className="text-xl font-bold font-serif text-slate-900 border-b border-slate-100 pb-2">1. Author Copyright Ownership</h2>
           <p className="text-sm text-slate-700 leading-relaxed">
-            Authors publishing in IJCAST retain full copyright ownership of their scholarly work. Authors grant the publisher a non-exclusive license to publish, archive, and distribute the article under an open-access format.
+            Authors publishing in IJRT retain full copyright ownership of their scholarly work. Authors grant the publisher a non-exclusive license to publish, archive, and distribute the article under an open-access format.
           </p>
         </div>
 
@@ -39,7 +39,7 @@ export const Copyright = () => {
               <li><strong>Share</strong> — Copy and redistribute the material in any medium or format.</li>
               <li><strong>Adapt</strong> — Remix, transform, and build upon the material for any purpose.</li>
             </ul>
-            <p className="pt-1 text-slate-500">Provided proper credit is given to the original authors and IJCAST is cited as the original venue of publication.</p>
+            <p className="pt-1 text-slate-500">Provided proper credit is given to the original authors and IJRT is cited as the original venue of publication.</p>
           </div>
         </div>
 
@@ -54,4 +54,5 @@ export const Copyright = () => {
     </div>
   );
 };
+
 

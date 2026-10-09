@@ -11,19 +11,19 @@ export const supabase = isSupabaseConfigured
   : null;
 
 const STORAGE_KEYS = {
-  SETTINGS: 'ijcast_settings_v5',
-  VOLUMES: 'ijcast_volumes_v2',
-  ISSUES: 'ijcast_issues_v2',
-  ARTICLES: 'ijcast_articles_v2',
-  EDITORIAL: 'ijcast_editorial_v2',
-  RESEARCH_AREAS: 'ijcast_research_areas_v2',
-  PAGE_CONTENT: 'ijcast_page_content_v2',
-  MEDIA: 'ijcast_media_v2',
-  ADMIN_SESSION: 'ijcast_admin_session',
-  THESES: 'ijcast_theses_v2',
-  ANNOUNCEMENTS: 'ijcast_announcements',
-  CONFERENCES: 'ijcast_conferences',
-  PENDING_SUBMISSIONS: 'ijcast_pending_submissions'
+  SETTINGS: 'IJRT_settings_v5',
+  VOLUMES: 'IJRT_volumes_v2',
+  ISSUES: 'IJRT_issues_v2',
+  ARTICLES: 'IJRT_articles_v2',
+  EDITORIAL: 'IJRT_editorial_v2',
+  RESEARCH_AREAS: 'IJRT_research_areas_v2',
+  PAGE_CONTENT: 'IJRT_page_content_v2',
+  MEDIA: 'IJRT_media_v2',
+  ADMIN_SESSION: 'IJRT_admin_session',
+  THESES: 'IJRT_theses_v2',
+  ANNOUNCEMENTS: 'IJRT_announcements',
+  CONFERENCES: 'IJRT_conferences',
+  PENDING_SUBMISSIONS: 'IJRT_pending_submissions'
 };
 
 // Helper for LocalStorage Persistence
@@ -105,4 +105,5 @@ export const updatePendingLocalSubmissionStatus = (submissionId, newStatus) => {
 };
 
 export { STORAGE_KEYS };
+
 

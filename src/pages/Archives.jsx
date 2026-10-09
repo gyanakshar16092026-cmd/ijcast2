@@ -28,7 +28,7 @@ export const Archives = () => {
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold font-serif">Journal Archives</h1>
         <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
-          Access all historical volumes, back-issues, and archived peer-reviewed papers published by IJCAST.
+          Access all historical volumes, back-issues, and archived peer-reviewed papers published by IJRT.
         </p>
       </div>
 
@@ -127,4 +127,5 @@ export const Archives = () => {
     </div>
   );
 };
+
 

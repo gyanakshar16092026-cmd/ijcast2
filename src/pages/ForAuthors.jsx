@@ -95,7 +95,7 @@ export const ForAuthors = () => {
             </div>
             <div className="flex-1 space-y-2">
               <div>
-                <h4 className="text-sm font-bold text-slate-900">IJCAST Manuscript Template</h4>
+                <h4 className="text-sm font-bold text-slate-900">IJRT Manuscript Template</h4>
                 <p className="text-xs text-slate-600 mt-0.5">Official Word template for formatting your paper before submission.</p>
                 <p className="text-[11px] text-amber-700 font-medium mt-1">IJRT Paper Template.docx</p>
               </div>
@@ -194,4 +194,5 @@ export const ForAuthors = () => {
     </div>
   );
 };
+
 

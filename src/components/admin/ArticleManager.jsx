@@ -560,12 +560,12 @@ export const ArticleManager = () => {
               </div>
 
               <div>
-                <label className="block text-slate-300 mb-1">Article DOI (e.g. 10.5281/ijcast.2026.101)</label>
+                <label className="block text-slate-300 mb-1">Article DOI (e.g. 10.5281/IJRT.2026.101)</label>
                 <input
                   type="text"
                   value={formData.doi}
                   onChange={e => setFormData({ ...formData, doi: e.target.value })}
-                  placeholder="10.5281/ijcast.2026.101"
+                  placeholder="10.5281/IJRT.2026.101"
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono"
                 />
               </div>
@@ -857,4 +857,5 @@ export const ArticleManager = () => {
     </div>
   );
 };
+
 

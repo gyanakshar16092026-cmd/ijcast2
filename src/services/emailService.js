@@ -319,7 +319,7 @@ VITE_EMAILJS_SUBMISSION_TEMPLATE_ID=your_template_id
 
 TO: ${submission.author_email}
 CC: editor.ijrt.in@gmail.com, gyanakshar16092026@gmail.com
-SUBJECT: Paper Accepted - ${submission.paper_title} - IJCAST
+SUBJECT: Paper Accepted - ${submission.paper_title} - IJRT
 
 Dear ${submission.author_name},
 
@@ -387,7 +387,7 @@ Your research is now freely accessible worldwide!
         body: JSON.stringify({
           to: submission.author_email,
           cc: ['editor.ijrt.in@gmail.com', 'gyanakshar16092026@gmail.com'],
-          subject: `Paper Accepted - ${submission.paper_title} - IJCAST`,
+          subject: `Paper Accepted - ${submission.paper_title} - IJRT`,
           submission: submission
         })
       });
@@ -407,4 +407,5 @@ Your research is now freely accessible worldwide!
 }
 
 export const emailService = new EmailService();
+
 

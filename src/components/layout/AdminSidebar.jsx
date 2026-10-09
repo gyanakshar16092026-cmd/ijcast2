@@ -54,7 +54,7 @@ export const AdminSidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarO
         <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
           <div>
             <span className="text-xs uppercase font-bold text-amber-500 tracking-wider">Admin Control Panel</span>
-            <h2 className="text-base font-bold text-white font-serif">{settings.short_name || 'IJCAST'}</h2>
+            <h2 className="text-base font-bold text-white font-serif">{settings.short_name || 'IJRT'}</h2>
           </div>
           <div className="flex items-center space-x-2">
             <div className="p-1.5 bg-amber-500/10 text-amber-400 rounded-lg">
@@ -128,4 +128,5 @@ export const AdminSidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarO
     </aside>
   );
 };
+
 

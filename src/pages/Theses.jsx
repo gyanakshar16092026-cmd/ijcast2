@@ -45,7 +45,7 @@ export function Theses() {
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold font-serif">PhD & M.Tech Theses</h1>
         <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
-          A curated repository of doctoral and post-graduate research theses indexed by IJCAST across multidisciplinary fields.
+          A curated repository of doctoral and post-graduate research theses indexed by IJRT across multidisciplinary fields.
         </p>
 
         {/* Stats row */}
@@ -230,4 +230,5 @@ export function Theses() {
     </div>
   );
 }
+
 

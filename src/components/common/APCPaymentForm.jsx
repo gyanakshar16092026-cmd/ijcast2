@@ -260,7 +260,7 @@ export const APCPaymentForm = () => {
                 name="manuscriptId"
                 value={formData.manuscriptId}
                 onChange={handleInputChange}
-                placeholder="e.g., IJCAST-2024-001"
+                placeholder="e.g., IJRT-2024-001"
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
                   errors.manuscriptId ? 'border-red-300' : 'border-slate-300'
                 }`}
@@ -382,3 +382,4 @@ export const APCPaymentForm = () => {
     </div>
   );
 };
+

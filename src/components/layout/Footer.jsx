@@ -14,7 +14,7 @@ export const Footer = () => {
         <div className="space-y-3 md:col-span-1">
           <div className="flex items-center space-x-2 text-white">
             <BookOpen className="w-5 h-5 text-amber-500" />
-            <span className="font-serif font-bold text-sm">{settings.short_name || 'IJCAST'}</span>
+            <span className="font-serif font-bold text-sm">{settings.short_name || 'IJRT'}</span>
           </div>
           <p className="text-slate-400 leading-relaxed text-[11px]">
             {settings.journal_name} is an international multidisciplinary peer-reviewed open access journal dedicated to publishing pioneering research across Commerce, Arts, Science, and Technology.
@@ -29,7 +29,7 @@ export const Footer = () => {
         <div className="space-y-3">
           <h4 className="font-serif font-bold text-slate-200 text-sm">Quick Links</h4>
           <ul className="space-y-2 text-[11px]">
-            <li><Link to="/about" className="hover:text-amber-400 transition-colors">About IJCAST</Link></li>
+            <li><Link to="/about" className="hover:text-amber-400 transition-colors">About IJRT</Link></li>
             <li><Link to="/editorial-board" className="hover:text-amber-400 transition-colors">Editorial Board</Link></li>
             <li><Link to="/for-authors" className="hover:text-amber-400 transition-colors">Author Guidelines</Link></li>
             <li><button onClick={() => setIsSubmitOpen(true)} className="hover:text-amber-400 transition-colors text-left">Submit Manuscript</button></li>
@@ -78,7 +78,7 @@ export const Footer = () => {
       {/* Bottom Bar & Admin Link */}
       <div className="bg-slate-900/80 border-t border-slate-800/80 py-4 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500">
-          <p>© {new Date().getFullYear()} {settings.short_name || 'IJCAST'}. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} {settings.short_name || 'IJRT'}. All rights reserved.</p>
           <div className="flex items-center space-x-4">
             <Link to="/terms" className="hover:text-slate-300">Terms & Conditions</Link>
             <Link to="/privacy" className="hover:text-slate-300">Privacy Policy</Link>
@@ -97,4 +97,5 @@ export const Footer = () => {
     </footer>
   );
 };
+
 

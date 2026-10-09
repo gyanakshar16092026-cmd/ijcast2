@@ -351,7 +351,7 @@ export const APCPayment = () => {
                     required
                   />
                   <span className="text-sm text-slate-700">
-                    I agree to the <strong>Copyright Transfer Agreement</strong> and confirm that I have the authority to transfer copyright for this work to IJCAST.
+                    I agree to the <strong>Copyright Transfer Agreement</strong> and confirm that I have the authority to transfer copyright for this work to IJRT.
                   </span>
                 </label>
               </div>
@@ -426,3 +426,4 @@ export const APCPayment = () => {
     </div>
   );
 };
+
